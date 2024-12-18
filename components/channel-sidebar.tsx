@@ -10,6 +10,9 @@ import { useUser } from "@clerk/nextjs";
 
 export default function ChannelSidebar() {
   const { user } = useUser();
+  const username =
+    user?.username ||
+    user?.emailAddresses[0].emailAddress.split("@")[0].replaceAll(".", "");
 
   return (
     <div className="w-60 bg-[#2B2D31] flex flex-col min-h-screen">
@@ -62,8 +65,8 @@ export default function ChannelSidebar() {
               <div className="text-xs text-[#949BA4] absolute top-0 left-0 transform group-hover:-translate-y-full transition-all duration-200">
                 Invisible
               </div>
-              <div className="text-xs text-[#949BA4] absolute top-0 left-0 transform translate-y-full group-hover:translate-y-0 transition-all duration-200">
-                {user?.username || user?.firstName}
+              <div className="text-xs text-[#949BA4] truncate absolute top-0 left-0 transform translate-y-full group-hover:translate-y-0 transition-all duration-200">
+                {username}
               </div>
             </div>
           </div>
