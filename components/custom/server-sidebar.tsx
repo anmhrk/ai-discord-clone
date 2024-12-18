@@ -1,7 +1,7 @@
 "use client";
 
 import { Plus } from "lucide-react";
-import { Separator } from "./ui/separator";
+import { Separator } from "../ui/separator";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";

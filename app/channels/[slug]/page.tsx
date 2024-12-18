@@ -1,5 +1,5 @@
-import MainTopNav from "@/components/main-top-nav";
-import MainContent from "@/components/main-content";
+import MainTopNav from "@/components/custom/main-top-nav";
+import MainContent from "@/components/custom/main-content";
 import { redirect } from "next/navigation";
 
 export default async function Page({

@@ -2,17 +2,19 @@
 
 import { Mic, Headphones, Settings } from "lucide-react";
 import { Plus, Users } from "lucide-react";
-import { ScrollArea } from "./ui/scroll-area";
-import { Separator } from "./ui/separator";
-import { Skeleton } from "./ui/skeleton";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { useUser } from "@clerk/nextjs";
+import { ScrollArea } from "../ui/scroll-area";
+import { Separator } from "../ui/separator";
+import { Skeleton } from "../ui/skeleton";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Preloaded, usePreloadedQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
-export default function ChannelSidebar() {
-  const { user } = useUser();
-  const username =
-    user?.username ||
-    user?.emailAddresses[0].emailAddress.split("@")[0].replaceAll(".", "");
+export default function ChannelSidebar({
+  preloadedUserData,
+}: {
+  preloadedUserData: Preloaded<typeof api.user.getUserData>;
+}) {
+  const userData = usePreloadedQuery(preloadedUserData);
 
   return (
     <div className="w-60 bg-[#2B2D31] flex flex-col min-h-screen">
@@ -54,19 +56,19 @@ export default function ChannelSidebar() {
       <div className="px-1 py-[6px] bg-[#232428] flex items-center justify-between gap-2 min-h-[52px] group">
         <div className="px-1 flex items-center gap-2 hover:bg-[#35373C] w-full rounded-[4px] cursor-pointer">
           <Avatar className="w-8 h-8">
-            <AvatarImage src={user?.imageUrl} />
-            <AvatarFallback>{user?.firstName?.charAt(0)}</AvatarFallback>
+            <AvatarImage src={userData?.profileImageUrl} />
+            <AvatarFallback>{userData?.name?.charAt(0)}</AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
             <div className="text-sm font-semibold truncate text-[#DBDEE1]">
-              {user?.firstName}
+              {userData?.name}
             </div>
             <div className="relative overflow-hidden h-[16px]">
               <div className="text-xs text-[#949BA4] absolute top-0 left-0 transform group-hover:-translate-y-full transition-all duration-200">
                 Invisible
               </div>
               <div className="text-xs text-[#949BA4] truncate absolute top-0 left-0 transform translate-y-full group-hover:translate-y-0 transition-all duration-200">
-                {username}
+                {userData?.username}
               </div>
             </div>
           </div>

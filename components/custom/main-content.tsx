@@ -1,5 +1,5 @@
-import { Input } from "./ui/input";
-import { ScrollArea } from "./ui/scroll-area";
+import { Input } from "../ui/input";
+import { ScrollArea } from "../ui/scroll-area";
 import { Search } from "lucide-react";
 
 export default function MainContent() {
