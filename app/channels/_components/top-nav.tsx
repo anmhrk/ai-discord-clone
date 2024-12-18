@@ -1,7 +1,7 @@
 import { Separator } from "@/components/ui/separator";
-import { MessageSquare, Users } from "lucide-react";
+import { Users } from "lucide-react";
 
-export default function MainTopNav() {
+export default function TopNav() {
   return (
     <div className="flex flex-col text-zinc-400">
       <div className="h-12.5 border-b border-[#202225] flex items-center px-4">
@@ -16,17 +16,9 @@ export default function MainTopNav() {
               All
             </button>
             <button className="bg-[#248045] h-fit px-2 rounded-sm">
-              Add Friend
-            </button>
-            <button className="bg-[#248045] h-fit px-2 rounded-sm">
               Create Friend
             </button>
           </nav>
-        </div>
-        <div className="flex items-center gap-4 ml-auto">
-          <button className="w-6 h-6 text-[#B9BBBE] hover:text-white">
-            <MessageSquare className="w-5 h-5" />
-          </button>
         </div>
       </div>
     </div>

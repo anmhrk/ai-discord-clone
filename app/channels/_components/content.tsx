@@ -1,8 +1,8 @@
-import { Input } from "../ui/input";
-import { ScrollArea } from "../ui/scroll-area";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Search } from "lucide-react";
 
-export default function MainContent() {
+export default function Content() {
   return (
     <div className="flex-1 flex">
       <div className="flex-1 flex flex-col py-4 px-8 gap-5">

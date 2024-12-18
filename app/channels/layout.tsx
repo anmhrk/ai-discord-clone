@@ -1,5 +1,5 @@
-import ChannelSidebar from "@/components/layout/channel-sidebar";
-import ServerSidebar from "@/components/layout/server-sidebar";
+import ServerSidebar from "@/components/server-sidebar";
+import SidePanel from "@/components/side-panel";
 import { api } from "@/convex/_generated/api";
 import { auth } from "@clerk/nextjs/server";
 import { preloadQuery } from "convex/nextjs";
@@ -17,8 +17,8 @@ export default async function Layout({
   return (
     <div className="flex h-screen">
       <ServerSidebar preloadedUserData={preloadedUserData} />
-      <ChannelSidebar preloadedUserData={preloadedUserData} />
-      {children}
+      <SidePanel preloadedUserData={preloadedUserData} />
+      <div className="flex-1 flex flex-col">{children}</div>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { mutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
 export const createServer = mutation({
@@ -31,4 +31,11 @@ export const createServer = mutation({
       throw new Error(error as string);
     }
   },
+});
+
+export const getServersForUser = query({
+  args: {
+    userId: v.string(),
+  },
+  handler: async (ctx, args) => {},
 });

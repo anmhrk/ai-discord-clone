@@ -2,6 +2,7 @@
 
 import { api } from "@/convex/_generated/api";
 import { fetchMutation } from "convex/nextjs";
+import { redirect } from "next/navigation";
 
 export async function createServer(
   serverName: string,
@@ -9,6 +10,10 @@ export async function createServer(
   userId: string | null
 ) {
   const serverId = String(
+    Math.floor(Math.random() * 9000000000000000000) + 1000000000000000000
+  );
+
+  const generalChannelId = String(
     Math.floor(Math.random() * 9000000000000000000) + 1000000000000000000
   );
 
@@ -49,6 +54,12 @@ export async function createServer(
           userId,
           serverImageUrl: url,
         });
+
+        await fetchMutation(api.channel.createChannel, {
+          name: "general",
+          channelId: generalChannelId,
+          serverId,
+        });
       }
     } else {
       await fetchMutation(api.server.createServer, {
@@ -56,7 +67,15 @@ export async function createServer(
         serverId,
         userId,
       });
+
+      await fetchMutation(api.channel.createChannel, {
+        name: "general",
+        channelId: generalChannelId,
+        serverId,
+      });
     }
+
+    redirect(`/channels/${serverId}/${generalChannelId}`);
   } catch (error) {
     if (error instanceof Error) {
       throw error;
@@ -64,10 +83,6 @@ export async function createServer(
     throw new Error(String(error));
   }
 }
-
-export async function joinServer(inviteLink: string, userId: string) {}
-
-export async function leaveServer(serverId: string, userId: string) {}
 
 export async function deleteServer(serverId: string, userId: string) {}
 

@@ -1,5 +1,5 @@
-import MainTopNav from "@/components/layout/main-top-nav";
-import MainContent from "@/components/layout/main-content";
+import TopNav from "@/app/channels/_components/top-nav";
+import Content from "@/app/channels/_components/content";
 import { redirect } from "next/navigation";
 
 export default async function Page({
@@ -14,8 +14,8 @@ export default async function Page({
 
   return (
     <div className="flex-1 flex flex-col">
-      <MainTopNav />
-      <MainContent />
+      <TopNav />
+      <Content />
     </div>
   );
 }
