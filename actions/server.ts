@@ -2,7 +2,6 @@
 
 import { api } from "@/convex/_generated/api";
 import { fetchMutation } from "convex/nextjs";
-import { redirect } from "next/navigation";
 
 export async function createServer(
   serverName: string,
@@ -38,7 +37,7 @@ export async function createServer(
       });
 
       if (!result.ok) {
-        throw new Error("Upload failed:" + result.statusText);
+        throw new Error("Image upload failed:" + result.statusText);
       }
 
       const { storageId } = await result.json();
@@ -47,7 +46,7 @@ export async function createServer(
         storageId,
       });
 
-      if (url && userId) {
+      if (url) {
         await fetchMutation(api.server.createServer, {
           serverName,
           serverId,
@@ -60,6 +59,8 @@ export async function createServer(
           channelId: generalChannelId,
           serverId,
         });
+      } else {
+        throw new Error("Image upload failed");
       }
     } else {
       await fetchMutation(api.server.createServer, {
@@ -74,14 +75,17 @@ export async function createServer(
         serverId,
       });
     }
-
-    redirect(`/channels/${serverId}/${generalChannelId}`);
   } catch (error) {
     if (error instanceof Error) {
       throw error;
     }
     throw new Error(String(error));
   }
+
+  return {
+    serverId,
+    generalChannelId,
+  };
 }
 
 export async function deleteServer(serverId: string, userId: string) {}

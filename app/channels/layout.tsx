@@ -13,10 +13,16 @@ export default async function Layout({
   const preloadedUserData = await preloadQuery(api.user.getUserData, {
     userId: userId!,
   });
+  const preloadedServers = await preloadQuery(api.server.getServersForUser, {
+    userId: userId!,
+  });
 
   return (
     <div className="flex h-screen">
-      <ServerSidebar preloadedUserData={preloadedUserData} />
+      <ServerSidebar
+        preloadedUserData={preloadedUserData}
+        preloadedServers={preloadedServers}
+      />
       <SidePanel preloadedUserData={preloadedUserData} />
       <div className="flex-1 flex flex-col">{children}</div>
     </div>

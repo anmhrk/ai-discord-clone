@@ -11,6 +11,7 @@ import { UserData } from "@/lib/types";
 import Image from "next/image";
 import { createServer } from "@/actions/server";
 import { Loader } from "./loader";
+import { useRouter } from "next/navigation";
 
 export default function CreateServerDialog({
   open,
@@ -27,6 +28,7 @@ export default function CreateServerDialog({
   const [serverImage, setServerImage] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   return (
     <Dialog
@@ -36,6 +38,7 @@ export default function CreateServerDialog({
         if (!open) {
           setServerName(`${userData?.username}'s server`);
           setServerImage(null);
+          setError(null);
         }
       }}
     >
@@ -117,11 +120,13 @@ export default function CreateServerDialog({
             onClick={async () => {
               setLoading(true);
               try {
-                await createServer(
+                const { serverId, generalChannelId } = await createServer(
                   serverName,
                   serverImage,
                   userData?.userId || null
                 );
+                onOpenChange(false);
+                router.push(`/channels/${serverId}/${generalChannelId}`);
               } catch (error) {
                 setError(
                   error instanceof Error ? error.message : "Unknown error"

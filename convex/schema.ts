@@ -14,15 +14,19 @@ export default defineSchema({
     .index("by_username", ["username"]),
 
   friends: defineTable({
-    name: v.string(),
+    friendId: v.string(),
     creatorId: v.id("users"),
-    model: v.string(), // should be v.union with model names
+    name: v.string(),
+    username: v.string(),
+    model: v.string(),
     personality: v.string(),
     friendImageUrl: v.optional(v.string()),
     updatedAt: v.optional(v.number()),
   })
+    .index("by_friendId", ["friendId"])
+    .index("by_creatorId", ["creatorId"])
     .index("by_name", ["name"])
-    .index("by_creatorId", ["creatorId"]),
+    .index("by_username", ["username"]),
 
   servers: defineTable({
     name: v.string(),
@@ -30,16 +34,17 @@ export default defineSchema({
     ownerId: v.id("users"),
     serverImageUrl: v.optional(v.string()),
     updatedAt: v.optional(v.number()),
+    defaultChannelId: v.string(),
   })
+    .index("by_name", ["name"])
     .index("by_serverId", ["serverId"])
-    .index("by_name", ["name"]),
+    .index("by_ownerId", ["ownerId"]),
 
   serverMembers: defineTable({
-    userId: v.union(v.id("users"), v.id("friends")),
+    memberId: v.union(v.id("users"), v.id("friends")),
     serverId: v.id("servers"),
-    joinedAt: v.number(),
   })
-    .index("by_userId", ["userId"])
+    .index("by_memberId", ["memberId"])
     .index("by_serverId", ["serverId"]),
 
   channels: defineTable({
@@ -47,7 +52,6 @@ export default defineSchema({
     channelId: v.string(),
     serverId: v.id("servers"),
     updatedAt: v.optional(v.number()),
-    categoryId: v.optional(v.id("categories")),
   })
     .index("by_channelId", ["channelId"])
     .index("by_serverId", ["serverId"])
@@ -65,32 +69,24 @@ export default defineSchema({
     .index("by_channelId", ["channelId"])
     .index("by_senderId", ["senderId"]),
 
-  categories: defineTable({
-    name: v.string(),
-    serverId: v.id("servers"),
-    updatedAt: v.optional(v.number()),
-  })
-    .index("by_serverId", ["serverId"])
-    .index("by_name", ["name"]),
-
   directMessages: defineTable({
-    participantOne: v.id("users"),
-    participantTwo: v.id("users"),
+    participantOneId: v.id("users"),
+    participantTwoId: v.id("friends"),
     updatedAt: v.optional(v.number()),
   })
-    .index("by_participants", ["participantOne", "participantTwo"])
-    .index("by_participantOne", ["participantOne"])
-    .index("by_participantTwo", ["participantTwo"]),
+    .index("by_participants", ["participantOneId", "participantTwoId"])
+    .index("by_participantOne", ["participantOneId"])
+    .index("by_participantTwo", ["participantTwoId"]),
 
-  messages: defineTable({
-    directMessageId: v.id("directMessages"),
-    senderId: v.id("users"),
+  messagesInDm: defineTable({
+    conversationId: v.id("directMessages"),
+    senderId: v.union(v.id("users"), v.id("friends")),
     content: v.string(),
-    replyTo: v.optional(v.id("messages")),
+    replyTo: v.optional(v.id("messagesInDm")),
     isEdited: v.optional(v.boolean()),
     editedAt: v.optional(v.number()),
     deletedAt: v.optional(v.number()),
   })
-    .index("by_directMessageId", ["directMessageId"])
+    .index("by_conversationId", ["conversationId"])
     .index("by_senderId", ["senderId"]),
 });
