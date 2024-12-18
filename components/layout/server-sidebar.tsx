@@ -5,8 +5,18 @@ import { Separator } from "../ui/separator";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
+import CreateServerDialog from "../server/create-server-dialog";
+import { api } from "@/convex/_generated/api";
+import { Preloaded, usePreloadedQuery } from "convex/react";
 
-export default function ServerSidebar() {
+export default function ServerSidebar({
+  preloadedUserData,
+}: {
+  preloadedUserData: Preloaded<typeof api.user.getUserData>;
+}) {
+  const userData = usePreloadedQuery(preloadedUserData);
+  const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const isOnHome = pathname === "/channels/@me";
 
@@ -27,9 +37,21 @@ export default function ServerSidebar() {
         </Link>
       </div>
       <Separator className="w-8 h-[2px] bg-[#36393F]" />
-      <button className="w-12 h-12 bg-[#36393F] rounded-full hover:rounded-[16px] flex items-center justify-center text-[#22A559] hover:bg-[#22A559] hover:text-white transition-colors">
+      <button
+        className={`w-12 h-12 hover:rounded-[16px] flex items-center justify-center hover:bg-[#22A559] hover:text-white transition-colors ${
+          open
+            ? "rounded-[16px] bg-[#22A559] text-white"
+            : "rounded-full bg-[#36393F] text-[#22A559]"
+        }`}
+        onClick={() => setOpen(true)}
+      >
         <Plus className="w-6 h-6" />
       </button>
+      <CreateServerDialog
+        open={open}
+        onOpenChange={setOpen}
+        userData={userData}
+      />
     </div>
   );
 }

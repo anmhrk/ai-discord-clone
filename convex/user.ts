@@ -7,8 +7,6 @@ export const insertUser = mutation({
     name: v.string(),
     username: v.string(),
     profileImageUrl: v.string(),
-    createdAt: v.number(),
-    updatedAt: v.number(),
   },
   handler: async (ctx, args) => {
     try {
@@ -17,8 +15,6 @@ export const insertUser = mutation({
         name: args.name,
         username: args.username,
         profileImageUrl: args.profileImageUrl,
-        createdAt: args.createdAt,
-        updatedAt: args.updatedAt,
       });
     } catch (error) {
       throw new Error("Failed to create user");
