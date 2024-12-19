@@ -1,7 +1,21 @@
 "use server";
 
 import { api } from "@/convex/_generated/api";
+import { auth } from "@clerk/nextjs/server";
 import { fetchMutation } from "convex/nextjs";
+
+export async function checkIfUserIsInServer(serverId: string) {
+  // server can exist but if user is not a member, then return false
+
+  const { userId } = await auth();
+
+  const isUserInServer = await fetchMutation(api.server.checkIfUserIsInServer, {
+    serverId,
+    userId: userId!,
+  });
+
+  return isUserInServer;
+}
 
 export async function createServer(
   serverName: string,

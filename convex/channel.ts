@@ -1,4 +1,4 @@
-import { mutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
 export const createChannel = mutation({
@@ -34,5 +34,30 @@ export const createChannel = mutation({
     } catch (error) {
       throw new Error(error as string);
     }
+  },
+});
+
+export const getChannelsForServer = query({
+  args: {
+    serverId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const server = await ctx.db
+      .query("servers")
+      .filter((q) => {
+        return q.eq(q.field("serverId"), args.serverId);
+      })
+      .first();
+
+    if (!server) {
+      return false;
+    }
+
+    const channels = await ctx.db
+      .query("channels")
+      .filter((q) => q.eq(q.field("serverId"), server._id))
+      .collect();
+
+    return channels;
   },
 });

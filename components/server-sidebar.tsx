@@ -55,7 +55,7 @@ export default function ServerSidebar({
                 >
                   <ActiveIndicator isActive={isActive} />
                   <button
-                    className={`w-12 h-12 hover:rounded-[16px] flex items-center justify-center transition-all overflow-hidden ${
+                    className={`w-12 h-12 hover:rounded-[16px] flex items-center justify-center transition-colors overflow-hidden ${
                       open || isActive ? "rounded-[16px]" : "rounded-full"
                     }`}
                     onClick={() =>

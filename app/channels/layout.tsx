@@ -1,8 +1,8 @@
 import ServerSidebar from "@/components/server-sidebar";
-import SidePanel from "@/components/side-panel";
 import { api } from "@/convex/_generated/api";
 import { auth } from "@clerk/nextjs/server";
 import { preloadQuery } from "convex/nextjs";
+import React from "react";
 
 export default async function Layout({
   children,
@@ -23,8 +23,7 @@ export default async function Layout({
         preloadedUserData={preloadedUserData}
         preloadedServers={preloadedServers}
       />
-      <SidePanel preloadedUserData={preloadedUserData} />
-      <div className="flex-1 flex flex-col">{children}</div>
+      {children}
     </div>
   );
 }

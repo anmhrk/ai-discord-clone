@@ -1,11 +1,20 @@
-import { Plus, Users } from "lucide-react";
-import { ScrollArea } from "./ui/scroll-area";
-import { Separator } from "./ui/separator";
-import { Skeleton } from "./ui/skeleton";
-import { UserData } from "@/lib/types";
-import UserInfo from "./user-info";
+"use client";
 
-export default function FriendsList({ userData }: { userData: UserData }) {
+import { Plus, Users } from "lucide-react";
+import { ScrollArea } from "../../../../components/ui/scroll-area";
+import { Separator } from "../../../../components/ui/separator";
+import { Skeleton } from "../../../../components/ui/skeleton";
+import UserInfo from "../../../../components/user-info";
+import { Preloaded, usePreloadedQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+
+export default function FriendsList({
+  preloadedUserData,
+}: {
+  preloadedUserData: Preloaded<typeof api.user.getUserData>;
+}) {
+  const userData = usePreloadedQuery(preloadedUserData);
+
   return (
     <div className="w-60 bg-[#2B2D31] flex flex-col min-h-screen">
       <div className="p-2.5">
