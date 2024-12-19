@@ -58,7 +58,10 @@ export default async function Page({
               preloadedServerData={preloadedServerData}
               preloadedChannels={preloadedChannels}
             />
-            <ChannelContent />
+            <ChannelContent
+              preloadedServerData={preloadedServerData}
+              preloadedChannels={preloadedChannels}
+            />
           </div>
         </>
       );

@@ -56,7 +56,7 @@ export default function ServerSidebar({
                   <ActiveIndicator isActive={isActive} />
                   <button
                     className={`w-12 h-12 hover:rounded-[16px] flex items-center justify-center transition-colors overflow-hidden ${
-                      open || isActive ? "rounded-[16px]" : "rounded-full"
+                      isActive ? "rounded-[16px]" : "rounded-full"
                     }`}
                     onClick={() =>
                       router.push(
@@ -84,7 +84,7 @@ export default function ServerSidebar({
                 <ActiveIndicator isActive={isActive} />
                 <button
                   className={`w-12 h-12 hover:rounded-[16px] flex items-center justify-center hover:bg-[#5765F2] hover:text-white transition-colors ${
-                    open || isActive
+                    isActive
                       ? "rounded-[16px] bg-[#5765F2] text-white"
                       : "rounded-full bg-[#36393F] text-[#DCDEE1]"
                   }`}

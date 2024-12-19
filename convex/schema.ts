@@ -17,7 +17,7 @@ export default defineSchema({
     friendId: v.string(),
     creatorId: v.id("users"),
     name: v.string(),
-    username: v.string(),
+    username: v.optional(v.string()),
     model: v.string(),
     personality: v.string(),
     friendImageUrl: v.optional(v.string()),

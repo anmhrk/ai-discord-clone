@@ -14,6 +14,7 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as channel from "../channel.js";
+import type * as friend from "../friend.js";
 import type * as server from "../server.js";
 import type * as storage from "../storage.js";
 import type * as user from "../user.js";
@@ -28,6 +29,7 @@ import type * as user from "../user.js";
  */
 declare const fullApi: ApiFromModules<{
   channel: typeof channel;
+  friend: typeof friend;
   server: typeof server;
   storage: typeof storage;
   user: typeof user;
