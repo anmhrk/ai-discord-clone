@@ -72,7 +72,7 @@ export default async function Page({
     <>
       <FriendsList preloadedUserData={preloadedUserData} />
       <div className="flex-1 flex flex-col">
-        <TopNav />
+        <TopNav preloadedUserData={preloadedUserData} />
         <Content />
       </div>
     </>

@@ -5,8 +5,7 @@ import { fetchMutation } from "convex/nextjs";
 
 export async function createFriend(
   userId: string | null,
-  name: string,
-  username: string | null,
+  friendName: string,
   model: string,
   personality: string,
   friendImage: File | null
@@ -15,13 +14,72 @@ export async function createFriend(
     Math.floor(Math.random() * 9000000000000000000) + 1000000000000000000
   );
 
-  //   await fetchMutation(api.friend.createFriend, {
-  //     userId: userId!,
-  //     friendId,
-  //     name,
-  //     username,
-  //     model,
-  //     personality,
-  //     friendImageUrl,
-  //   });
+  const friendUsername = friendName?.toLowerCase().replace(/\s+/g, "");
+
+  try {
+    if (!userId) {
+      throw new Error("User not found");
+    }
+
+    if (friendImage) {
+      const friendImageUrl = await fetchMutation(api.storage.generateUploadUrl);
+
+      const result = await fetch(friendImageUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": friendImage.type,
+        },
+        body: friendImage,
+      });
+
+      if (!result.ok) {
+        throw new Error("Image upload failed:" + result.statusText);
+      }
+
+      const { storageId } = await result.json();
+
+      const url = await fetchMutation(api.storage.getUploadUrl, {
+        storageId,
+      });
+
+      if (url) {
+        await fetchMutation(api.friend.createFriend, {
+          userId: userId!,
+          friendId,
+          name: friendName,
+          username: friendUsername,
+          model,
+          personality,
+          friendImageUrl: url,
+        });
+      } else {
+        throw new Error("Image upload failed");
+      }
+    } else {
+      await fetchMutation(api.friend.createFriend, {
+        userId: userId!,
+        friendId,
+        name: friendName,
+        username: friendUsername,
+        model,
+        personality,
+      });
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error(String(error));
+  }
 }
+
+export async function deleteFriend(friendId: string, userId: string) {}
+
+export async function updateFriend(
+  friendId: string,
+  userId: string,
+  newFriendName?: string,
+  newModel?: string,
+  newPersonality?: string,
+  newFriendImage?: File
+) {}

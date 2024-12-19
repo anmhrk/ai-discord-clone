@@ -111,10 +111,10 @@ export default function CreateServerDialog({
 
         <div className="flex justify-end p-4 bg-[#2B2D31] font-medium">
           <button
-            className={`min-w-[100px] h-[38px] bg-[#5865F2] text-white text-[14px] rounded-sm transition-colors flex items-center justify-center ${
+            className={`min-w-[100px] h-[38px] text-white text-[14px] rounded-sm transition-colors flex items-center justify-center ${
               !serverName
                 ? "bg-[#424993] cursor-not-allowed"
-                : "hover:bg-[#4752C4]"
+                : "hover:bg-[#4752C4] bg-[#5865F2]"
             }`}
             disabled={!serverName}
             onClick={async () => {
