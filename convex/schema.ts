@@ -22,6 +22,7 @@ export default defineSchema({
     personality: v.string(),
     friendImageUrl: v.optional(v.string()),
     updatedAt: v.optional(v.number()),
+    profileColor: v.optional(v.string()),
   })
     .index("by_friendId", ["friendId"])
     .index("by_creatorId", ["creatorId"])

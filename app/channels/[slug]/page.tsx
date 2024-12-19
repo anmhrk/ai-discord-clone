@@ -30,6 +30,9 @@ export default async function Page({
       serverId: slug,
     }
   );
+  const preloadedFriends = await preloadQuery(api.friend.getFriendsForUser, {
+    userId: userId!,
+  });
 
   // if slug is not a number and is not @me, then redirect to /channels/@me
   // if slug is a number, then do the fetch mutation
@@ -70,7 +73,10 @@ export default async function Page({
 
   return (
     <>
-      <FriendsList preloadedUserData={preloadedUserData} />
+      <FriendsList
+        preloadedUserData={preloadedUserData}
+        preloadedFriends={preloadedFriends}
+      />
       <div className="flex-1 flex flex-col">
         <TopNav preloadedUserData={preloadedUserData} />
         <Content />

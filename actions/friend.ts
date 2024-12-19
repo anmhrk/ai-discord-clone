@@ -16,6 +16,18 @@ export async function createFriend(
 
   const friendUsername = friendName?.toLowerCase().replace(/\s+/g, "");
 
+  const profileColors = [
+    "#FAA619",
+    "#5765F2",
+    "#3AA55C",
+    "#757E8A",
+    "#ED4245",
+    "#EB459F",
+  ];
+
+  const randomProfileColor =
+    profileColors[Math.floor(Math.random() * profileColors.length)];
+
   try {
     if (!userId) {
       throw new Error("User not found");
@@ -63,6 +75,7 @@ export async function createFriend(
         username: friendUsername,
         model,
         personality,
+        profileColor: randomProfileColor,
       });
     }
   } catch (error) {

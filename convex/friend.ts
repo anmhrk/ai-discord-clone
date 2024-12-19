@@ -10,6 +10,7 @@ export const createFriend = mutation({
     model: v.string(),
     personality: v.string(),
     friendImageUrl: v.optional(v.string()),
+    profileColor: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     try {
@@ -43,6 +44,7 @@ export const createFriend = mutation({
         model: args.model,
         personality: args.personality,
         friendImageUrl: args.friendImageUrl,
+        profileColor: args.profileColor,
       });
     } catch (error) {
       if (error instanceof Error) {
