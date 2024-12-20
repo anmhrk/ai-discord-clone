@@ -62,7 +62,7 @@ export default function FriendsList({
                           alt={friend?.name || ""}
                           width={32}
                           height={32}
-                          className="w-9 h-9 rounded-full object-cover"
+                          className="w-8 h-8 rounded-full object-cover"
                         />
                         <div className="w-3.5 h-3.5 bg-green-500 rounded-full absolute bottom-[-2px] right-0 border-[2px] border-[#232428]" />
                       </div>
@@ -73,7 +73,7 @@ export default function FriendsList({
                   ) : (
                     <>
                       <div
-                        className="w-9 h-9 rounded-full flex items-center justify-center"
+                        className="w-8 h-8 rounded-full flex items-center justify-center"
                         style={{ backgroundColor: friend?.profileColor }}
                       >
                         <div className="relative">

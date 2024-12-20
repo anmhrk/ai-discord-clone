@@ -1,22 +1,120 @@
+"use client";
+
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Search } from "lucide-react";
+import { usePreloadedQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { Preloaded } from "convex/react";
+import { MessageSquare, Search, X } from "lucide-react";
+import { TbMessageCircleFilled } from "react-icons/tb";
+import { Separator } from "@/components/ui/separator";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import Image from "next/image";
 
-export default function Content() {
+export default function Content({
+  preloadedFriends,
+}: {
+  preloadedFriends: Preloaded<typeof api.friend.getFriendsForUser>;
+}) {
+  const friends = usePreloadedQuery(preloadedFriends);
+  const [search, setSearch] = useState("");
+  const [filteredFriends, setFilteredFriends] = useState(friends);
+  const router = useRouter();
+
   return (
     <div className="flex-1 flex">
-      <div className="flex-1 flex flex-col py-4 px-8 gap-5">
+      <div className="flex-1 flex flex-col py-4 px-7">
         <div className="relative">
           <Input
             placeholder="Search"
-            className="bg-[#1E1F22] p-2 pl-2 pr-8 border-none text-zinc-200 text-md font-medium placeholder:text-[#949BA4]"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setFilteredFriends(
+                friends.filter((friend) =>
+                  friend?.name
+                    ?.toLowerCase()
+                    .includes(e.target.value.toLowerCase())
+                )
+              );
+            }}
+            className="bg-[#1E1F22] p-2 pl-2 pr-8 border-none text-zinc-200 text-md mb-5 font-medium placeholder:text-[#949BA4]"
           />
-          <Search className="absolute right-2 top-1/2 -translate-y-1/2 h-5 w-5 text-[#B5BAC1]" />
+          <Search className="absolute right-3 top-[50%] -translate-y-[90%] h-5 w-5 text-[#B5BAC1]" />
         </div>
+        <div className="text-[#B5BAC1] text-xs font-semibold mb-5">
+          ALL FRIENDS — {filteredFriends.length}
+        </div>
+        <Separator className="bg-zinc-700 h-[1px] w-full" />
         <ScrollArea className="flex-1">
-          <div className="text-[#B5BAC1] text-xs font-semibold">
-            ALL FRIENDS — 0
-          </div>
+          {filteredFriends &&
+            filteredFriends.map((friend) => (
+              <div
+                key={friend?._id || ""}
+                className="flex items-center w-full justify-between py-2.5 px-2 hover:bg-[#3A3B42] rounded-xl cursor-pointer group"
+                onClick={() => {
+                  router.push(`/channels/@me/${friend?.friendId}`);
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  {friend?.friendImageUrl ? (
+                    <div className="relative">
+                      <Image
+                        src={friend?.friendImageUrl}
+                        alt={friend?.name || ""}
+                        width={32}
+                        height={32}
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                      <div className="w-3.5 h-3.5 bg-green-500 rounded-full absolute bottom-[-2px] right-0 border-[2px] border-[#232428]" />
+                    </div>
+                  ) : (
+                    <div
+                      className="w-8 h-8 rounded-full flex items-center justify-center"
+                      style={{ backgroundColor: friend?.profileColor }}
+                    >
+                      <div className="relative">
+                        <Image
+                          src="/logo-white.svg"
+                          alt="Logo"
+                          width={32}
+                          height={32}
+                          className="w-5 h-5 rounded-full"
+                        />
+                        <div className="w-3.5 h-3.5 bg-green-500 rounded-full absolute bottom-[-10px] left-[14px] border-[2px] border-[#232428]" />
+                      </div>
+                    </div>
+                  )}
+                  <div className="flex flex-col justify-start">
+                    <div className="text-[#F2F3F5] truncate text-left flex items-center gap-1">
+                      <span className="text-[15px] font-semibold">
+                        {friend?.username}
+                      </span>
+                      <span className="text-[#B7BCC3] text-[13.5px] font-medium hidden group-hover:inline">
+                        {friend?.username}
+                      </span>
+                    </div>
+                    <div className="text-[14px] font-medium text-[#B5BAC1] text-left">
+                      Online
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button className="p-2 rounded-full bg-[#2B2D31] group-hover:bg-[#1E1F22] text-[#B5BAC1]">
+                    <TbMessageCircleFilled className="w-5 h-5" />
+                  </button>
+                  <button
+                    className="p-2 rounded-full bg-[#2B2D31] group-hover:bg-[#1E1F22] text-red-500"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            ))}
         </ScrollArea>
       </div>
 
