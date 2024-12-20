@@ -3,13 +3,13 @@ import { checkIfUserIsInServer } from "@/actions/server";
 import { auth } from "@clerk/nextjs/server";
 import { preloadQuery } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
-import TopNav from "../_components/@me/top-nav";
-import Content from "../_components/@me/content";
-import FriendsList from "../_components/@me/friends-list";
-import ServerNotFound from "../_components/server-not-found";
-import ChannelTopNav from "../_components/channel-top-nav";
-import ChannelContent from "../_components/channel-content";
-import ChannelsList from "../_components/channels-list";
+import TopNav from "../../../components/homepage/top-nav";
+import Content from "../../../components/homepage/content";
+import FriendsList from "../../../components/homepage/friends-list";
+import ServerNotFound from "../../../components/server/server-not-found";
+import ChannelTopNav from "../../../components/channel/channel-top-nav";
+import ChannelContent from "../../../components/channel/channel-content";
+import ChannelsList from "../../../components/channel/channels-list";
 
 export default async function Page({
   params,
@@ -47,7 +47,7 @@ export default async function Page({
     const isUserInServer = await checkIfUserIsInServer(slug);
 
     if (!isUserInServer) {
-      return <ServerNotFound />;
+      return <ServerNotFound preloadedUserData={preloadedUserData} />;
     } else {
       return (
         <>

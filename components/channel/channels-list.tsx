@@ -2,7 +2,7 @@
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import UserInfo from "@/components/user-info";
+import UserInfo from "@/components/common/user-info";
 import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
 import { Preloaded, usePreloadedQuery } from "convex/react";

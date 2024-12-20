@@ -1,4 +1,4 @@
-import ServerSidebar from "@/components/server-sidebar";
+import ServerSidebar from "@/components/server/server-sidebar";
 import { api } from "@/convex/_generated/api";
 import { auth } from "@clerk/nextjs/server";
 import { preloadQuery } from "convex/nextjs";

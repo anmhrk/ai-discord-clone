@@ -6,11 +6,11 @@ import {
 } from "@/components/ui/dialog";
 import { Camera, Plus } from "lucide-react";
 import { useState } from "react";
-import { Input } from "./ui/input";
+import { Input } from "@/components/ui/input";
 import { UserData } from "@/lib/types";
 import Image from "next/image";
 import { createServer } from "@/actions/server";
-import { Loader } from "./loader";
+import { Loader } from "@/components/common/loader";
 import { useRouter } from "next/navigation";
 
 export default function CreateServerDialog({

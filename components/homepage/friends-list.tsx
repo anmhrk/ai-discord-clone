@@ -1,10 +1,10 @@
 "use client";
 
 import { Plus, Users } from "lucide-react";
-import { ScrollArea } from "../../../../components/ui/scroll-area";
-import { Separator } from "../../../../components/ui/separator";
-import { Skeleton } from "../../../../components/ui/skeleton";
-import UserInfo from "../../../../components/user-info";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import UserInfo from "@/components/common/user-info";
 import { Preloaded, usePreloadedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import Image from "next/image";

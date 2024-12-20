@@ -1,5 +1,5 @@
 import { UserData } from "@/lib/types";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Headphones, Mic, Settings } from "lucide-react";
 
 export default function UserInfo({ userData }: { userData: UserData }) {
