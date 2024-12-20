@@ -102,7 +102,18 @@ export async function createServer(
   };
 }
 
-export async function deleteServer(serverId: string, userId: string) {}
+export async function deleteServer(serverId: string) {
+  try {
+    await fetchMutation(api.server.deleteServer, {
+      serverId,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error(String(error));
+  }
+}
 
 export async function updateServer(
   serverId: string,
@@ -110,3 +121,5 @@ export async function updateServer(
   newServerName?: string,
   newServerImage?: File
 ) {}
+
+export async function inviteNewMember(serverId: string, newMemberId: string) {}

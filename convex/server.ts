@@ -154,3 +154,55 @@ export const getServerData = query({
     return { server, serverMembers };
   },
 });
+
+export const deleteServer = mutation({
+  args: {
+    serverId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const server = await ctx.db
+      .query("servers")
+      .filter((q) => {
+        return q.eq(q.field("serverId"), args.serverId);
+      })
+      .first();
+
+    if (!server) {
+      throw new Error("Server not found");
+    }
+
+    await ctx.db.delete(server._id);
+
+    const serverMembers = await ctx.db
+      .query("serverMembers")
+      .filter((q) => {
+        return q.eq(q.field("serverId"), server._id);
+      })
+      .collect();
+
+    for (const member of serverMembers) {
+      await ctx.db.delete(member._id);
+    }
+
+    const channels = await ctx.db
+      .query("channels")
+      .filter((q) => {
+        return q.eq(q.field("serverId"), server._id);
+      })
+      .collect();
+
+    for (const channel of channels) {
+      await ctx.db.delete(channel._id);
+      const channelMessages = await ctx.db
+        .query("channelMessages")
+        .filter((q) => {
+          return q.eq(q.field("channelId"), channel._id);
+        })
+        .collect();
+
+      for (const message of channelMessages) {
+        await ctx.db.delete(message._id);
+      }
+    }
+  },
+});

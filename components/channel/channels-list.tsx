@@ -6,8 +6,18 @@ import UserInfo from "@/components/common/user-info";
 import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
 import { Preloaded, usePreloadedQuery } from "convex/react";
-import { ChevronDown, Hash, Plus } from "lucide-react";
+import { ChevronDown, Hash, Plus, X } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { FaEdit, FaUserPlus } from "react-icons/fa";
+import { FaCirclePlus } from "react-icons/fa6";
+import { deleteServer } from "@/actions/server";
+import { toast } from "sonner";
 
 export default function ChannelsList({
   preloadedUserData,
@@ -26,14 +36,65 @@ export default function ChannelsList({
   const params = useParams<{ serverId: string; channelId: string }>();
   const noChannelSelected = params.channelId === undefined;
 
+  const dropdownItems = [
+    {
+      label: "Invite Friends",
+      icon: FaUserPlus,
+      onClick: () => {},
+    },
+    {
+      label: "Edit Server",
+      icon: FaEdit,
+      onClick: () => {},
+    },
+    {
+      label: "Create Channel",
+      icon: FaCirclePlus,
+      onClick: () => {},
+    },
+    {
+      label: "Delete Server",
+      icon: X,
+      onClick: async () => {
+        try {
+          router.push("/channels/@me");
+          await deleteServer(serverData?.server.serverId);
+          toast.success("YourServer deleted");
+        } catch (error) {
+          toast.error(
+            error instanceof Error ? error.message : "Failed to delete server"
+          );
+        }
+      },
+    },
+  ];
+
   return (
     <div className="w-60 bg-[#2B2D31] flex flex-col min-h-screen">
-      <button className="h-12 px-4 flex items-center justify-between bg-[#2B2D31] hover:bg-[#36373C] transition-colors">
-        <span className="font-semibold text-[15px] text-[#DCDEE1]">
-          {serverData?.server.name}
-        </span>
-        <ChevronDown className="w-5 h-5 text-[#B5BAC1]" />
-      </button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button className="h-12 px-4 flex items-center justify-between bg-[#2B2D31] hover:bg-[#36373C] transition-colors">
+            <span className="font-semibold text-[15px] text-[#DCDEE1]">
+              {serverData?.server.name}
+            </span>
+            <ChevronDown className="w-5 h-5 text-[#B5BAC1]" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="bg-[#111214] w-52 mt-1 border-none flex flex-col gap-2">
+          {dropdownItems.map((item) => {
+            return (
+              <DropdownMenuItem
+                key={item.label}
+                className="flex items-center hover:cursor-pointer justify-between text-[#B5BAC1] p-2 hover:bg-[#5865F2] hover:text-white focus:bg-[#5865F2] focus:text-white data-[highlighted]:bg-[#5865F2] data-[highlighted]:text-white outline-none transition-none"
+                onClick={item.onClick}
+              >
+                <span className="text-[13px] font-semibold">{item.label}</span>
+                <item.icon className="w-4 h-4" />
+              </DropdownMenuItem>
+            );
+          })}
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       <Separator className="bg-[#1E1F22] h-[1px] w-full" />
       <ScrollArea className="flex-1">

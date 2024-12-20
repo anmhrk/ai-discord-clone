@@ -66,7 +66,7 @@ export default async function Page({
             preloadedChannels={preloadedChannels}
             preloadedServerData={preloadedServerData}
           />
-          <div className="flex-1 flex flex-col">
+          <div className="flex-1 flex flex-col h-screen">
             <ChannelTopNav
               preloadedServerData={preloadedServerData}
               preloadedChannels={preloadedChannels}

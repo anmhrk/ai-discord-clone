@@ -34,6 +34,28 @@ export default function ChannelContent({
             ?.name
         : "";
 
+  // const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // const scrollToBottom = () => {
+  //   messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  // };
+
+  // const scrollToBottomInstant = () => {
+  //   messagesEndRef.current?.scrollIntoView({ behavior: "instant" });
+  // };
+
+  // // Initial scroll on mount - instant
+  // useEffect(() => {
+  //   scrollToBottomInstant();
+  // }, []);
+
+  // // Smooth scroll when messages change
+  // useEffect(() => {
+  //   if (messages.length > 0) {
+  //     scrollToBottom();
+  //   }
+  // }, [messages]);
+
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "0px";
@@ -42,36 +64,52 @@ export default function ChannelContent({
     }
   }, [message]);
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      // call send message server action
+    }
+  };
+
   return (
     <div className="flex-1 flex flex-row">
-      <div className="flex-1 flex flex-col">
-        <ScrollArea className="flex-1 overflow-y-auto">
-          <div className="flex flex-col pb-4">
-            <div className="max-w-sm mx-auto py-8 text-center">
-              <p className="text-3xl font-bold text-[#DCDEE1] mb-1">
-                Welcome to
-              </p>
-              <p className="text-3xl font-bold text-[#DCDEE1] mb-3">
-                {serverData?.server.name}
-              </p>
-              <p className="text-[#B5BAC1] text-sm">
-                This is your brand new, shiny server. Have fun chatting with
-                your AI friends!
-              </p>
+      <div className="flex-1 flex flex-col h-full">
+        <ScrollArea className="flex-1 relative overflow-hidden min-h-0">
+          <div className="absolute inset-0 overflow-y-auto">
+            <div className="flex flex-col justify-end min-h-full">
+              <div className="flex flex-col">
+                <div className="max-w-sm mx-auto py-8 text-center">
+                  <p className="text-3xl font-bold text-[#DCDEE1] mb-1">
+                    Welcome to
+                  </p>
+                  <p className="text-3xl font-bold text-[#DCDEE1] mb-3">
+                    {serverData?.server.name}
+                  </p>
+                  <p className="text-[#B5BAC1] text-sm">
+                    This is your brand new, shiny server. Have fun chatting with
+                    your AI friends!
+                  </p>
+                </div>
+                <div className="flex flex-col gap-2 px-4 pb-4">
+                  {/* map messages here */}
+                  {/* <div ref={messagesEndRef} /> */}
+                </div>
+              </div>
             </div>
           </div>
         </ScrollArea>
-        <div className="px-4 pb-6">
-          <div className="flex items-center gap-4 bg-[#383A40] rounded-lg px-3 py-0.5">
+        <div className="flex-shrink-0 px-4 pb-6 mt-2">
+          <div className="flex items-center gap-4 bg-[#383A40] rounded-lg px-3 py-0.5 min-h-[44px]">
             <Textarea
               ref={textareaRef}
               placeholder={`Message #${channelName}`}
               className="resize-none max-h-[420px] flex-1 bg-[#383A40] font-medium border-none text-[#DCDEE1] placeholder:text-[#6D6F78]"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={handleKeyDown}
               rows={1}
             />
-            <FaSmile className="w-6 h-6 text-[#B3B7BE] hover:text-[#FCC145] cursor-pointer" />
+            <FaSmile className="w-6 h-6 text-[#B3B7BE] hover:text-[#FCC145] cursor-pointer flex-shrink-0" />
           </div>
         </div>
       </div>
