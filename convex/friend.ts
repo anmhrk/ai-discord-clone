@@ -87,3 +87,23 @@ export const getFriendsForUser = query({
     );
   },
 });
+
+export const deleteFriend = mutation({
+  args: {
+    friendId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const friend = await ctx.db
+      .query("friends")
+      .filter((q) => {
+        return q.eq(q.field("friendId"), args.friendId);
+      })
+      .first();
+
+    if (!friend) {
+      throw new Error("Friend not found");
+    }
+
+    await ctx.db.delete(friend._id);
+  },
+});

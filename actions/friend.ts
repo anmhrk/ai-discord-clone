@@ -86,7 +86,18 @@ export async function createFriend(
   }
 }
 
-export async function deleteFriend(friendId: string, userId: string) {}
+export async function deleteFriend(friendId: string) {
+  try {
+    await fetchMutation(api.friend.deleteFriend, {
+      friendId,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error(String(error));
+  }
+}
 
 export async function updateFriend(
   friendId: string,

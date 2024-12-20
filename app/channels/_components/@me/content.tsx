@@ -5,12 +5,14 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { usePreloadedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Preloaded } from "convex/react";
-import { MessageSquare, Search, X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { TbMessageCircleFilled } from "react-icons/tb";
 import { Separator } from "@/components/ui/separator";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
+import { toast } from "sonner";
+import { deleteFriend } from "@/actions/friend";
 
 export default function Content({
   preloadedFriends,
@@ -21,6 +23,10 @@ export default function Content({
   const [search, setSearch] = useState("");
   const [filteredFriends, setFilteredFriends] = useState(friends);
   const router = useRouter();
+
+  useEffect(() => {
+    setFilteredFriends(friends);
+  }, [friends]);
 
   return (
     <div className="flex-1 flex">
@@ -46,7 +52,9 @@ export default function Content({
         <div className="text-[#B5BAC1] text-xs font-semibold mb-5">
           ALL FRIENDS — {filteredFriends.length}
         </div>
-        <Separator className="bg-zinc-700 h-[1px] w-full" />
+        {filteredFriends.length > 0 && (
+          <Separator className="bg-zinc-700 h-[1px] w-full" />
+        )}
         <ScrollArea className="flex-1">
           {filteredFriends &&
             filteredFriends.map((friend) => (
@@ -89,7 +97,7 @@ export default function Content({
                   <div className="flex flex-col justify-start">
                     <div className="text-[#F2F3F5] truncate text-left flex items-center gap-1">
                       <span className="text-[15px] font-semibold">
-                        {friend?.username}
+                        {friend?.name}
                       </span>
                       <span className="text-[#B7BCC3] text-[13.5px] font-medium hidden group-hover:inline">
                         {friend?.username}
@@ -106,8 +114,18 @@ export default function Content({
                   </button>
                   <button
                     className="p-2 rounded-full bg-[#2B2D31] group-hover:bg-[#1E1F22] text-red-500"
-                    onClick={(e) => {
+                    onClick={async (e) => {
                       e.stopPropagation();
+                      try {
+                        await deleteFriend(friend?.friendId || "");
+                        toast.success("Your friend has been deleted!");
+                      } catch (error) {
+                        toast.error(
+                          error instanceof Error
+                            ? error.message
+                            : "Failed to delete friend"
+                        );
+                      }
                     }}
                   >
                     <X className="w-5 h-5" />
