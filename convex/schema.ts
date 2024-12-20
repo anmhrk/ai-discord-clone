@@ -42,8 +42,12 @@ export default defineSchema({
     .index("by_ownerId", ["ownerId"]),
 
   serverMembers: defineTable({
+    name: v.string(),
+    username: v.string(),
     memberId: v.union(v.id("users"), v.id("friends")),
     serverId: v.id("servers"),
+    profileImageUrl: v.optional(v.string()),
+    profileColor: v.optional(v.string()),
   })
     .index("by_memberId", ["memberId"])
     .index("by_serverId", ["serverId"]),

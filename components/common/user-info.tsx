@@ -1,16 +1,19 @@
 import { UserData } from "@/lib/types";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Headphones, Mic, Settings } from "lucide-react";
+import Image from "next/image";
 
 export default function UserInfo({ userData }: { userData: UserData }) {
   return (
     <div className="px-1 py-[6px] bg-[#232428] flex items-center justify-between gap-2 min-h-[52px] group">
       <div className="px-1 flex items-center gap-2 hover:bg-[#35373C] w-full rounded-[4px] cursor-pointer">
         <div className="relative">
-          <Avatar className="w-8 h-8">
-            <AvatarImage src={userData?.profileImageUrl} />
-            <AvatarFallback>{userData?.name?.charAt(0)}</AvatarFallback>
-          </Avatar>
+          <Image
+            src={userData?.profileImageUrl || "/placeholder.svg"}
+            alt={userData?.name || ""}
+            width={32}
+            height={32}
+            className="w-8 h-8 rounded-full"
+          />
           <div className="w-3.5 h-3.5 bg-green-500 rounded-full absolute bottom-[-2px] right-0 border-[2px] border-[#232428]" />
         </div>
         <div className="flex-1 min-w-0">

@@ -41,8 +41,11 @@ export const createServer = mutation({
       }
 
       await ctx.db.insert("serverMembers", {
+        name: user.name,
+        username: user.username,
         memberId: user._id,
         serverId: server._id,
+        profileImageUrl: user.profileImageUrl,
       });
     } catch (error) {
       throw new Error(error as string);
@@ -137,6 +140,17 @@ export const getServerData = query({
       })
       .first();
 
-    return server;
+    if (!server) {
+      throw new Error("Server not found");
+    }
+
+    const serverMembers = await ctx.db
+      .query("serverMembers")
+      .filter((q) => {
+        return q.eq(q.field("serverId"), server._id);
+      })
+      .collect();
+
+    return { server, serverMembers };
   },
 });

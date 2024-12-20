@@ -18,18 +18,11 @@ export default async function Page({
 }) {
   const slug = (await params).slug;
   const { userId } = await auth();
+
   const preloadedUserData = await preloadQuery(api.user.getUserData, {
     userId: userId!,
   });
-  const preloadedServerData = await preloadQuery(api.server.getServerData, {
-    serverId: slug,
-  });
-  const preloadedChannels = await preloadQuery(
-    api.channel.getChannelsForServer,
-    {
-      serverId: slug,
-    }
-  );
+
   const preloadedFriends = await preloadQuery(api.friend.getFriendsForUser, {
     userId: userId!,
   });
@@ -37,18 +30,28 @@ export default async function Page({
   // if slug is not a number and is not @me, then redirect to /channels/@me
   // if slug is a number, then do the fetch mutation
   // if false, then return a gray page like in discord, the side panel should also change
-  // if true, then return the base server page
+  // if true, then return the base server page with default channel stuff
 
   if (isNaN(Number(slug)) && decodeURIComponent(slug) !== "@me") {
     redirect("/channels/@me");
   }
 
   if (decodeURIComponent(slug) !== "@me") {
-    const isUserInServer = await checkIfUserIsInServer(slug);
+    const isUserInServer = await checkIfUserIsInServer(slug); // this also checks if the server exists
 
     if (!isUserInServer) {
       return <ServerNotFound preloadedUserData={preloadedUserData} />;
     } else {
+      const preloadedServerData = await preloadQuery(api.server.getServerData, {
+        serverId: slug,
+      });
+      const preloadedChannels = await preloadQuery(
+        api.channel.getChannelsForServer,
+        {
+          serverId: slug,
+        }
+      );
+
       return (
         <>
           <ChannelsList

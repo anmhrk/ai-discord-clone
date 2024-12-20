@@ -9,3 +9,14 @@ export type UserData = {
   username: string;
   profileImageUrl: string;
 } | null;
+
+export type ServerMember = {
+  _id: Id<"serverMembers">;
+  _creationTime: number;
+  profileImageUrl?: string | undefined;
+  profileColor?: string | undefined;
+  name: string;
+  serverId: Id<"servers">;
+  username: string;
+  memberId: Id<"users"> | Id<"friends">;
+};

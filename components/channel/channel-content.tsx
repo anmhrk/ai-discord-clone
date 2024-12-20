@@ -27,7 +27,7 @@ export default function ChannelContent({
   const channelName =
     channels && noChannelSelected
       ? channels?.find(
-          (channel) => channel.channelId === serverData?.defaultChannelId
+          (channel) => channel.channelId === serverData?.server.defaultChannelId
         )?.name
       : channels && params.channelId
         ? channels?.find((channel) => channel.channelId === params.channelId)
@@ -52,7 +52,7 @@ export default function ChannelContent({
                 Welcome to
               </p>
               <p className="text-3xl font-bold text-[#DCDEE1] mb-3">
-                {serverData?.name}
+                {serverData?.server.name}
               </p>
               <p className="text-[#B5BAC1] text-sm">
                 This is your brand new, shiny server. Have fun chatting with
@@ -75,7 +75,7 @@ export default function ChannelContent({
           </div>
         </div>
       </div>
-      <MemberList />
+      <MemberList serverMembers={serverData?.serverMembers} />
     </div>
   );
 }

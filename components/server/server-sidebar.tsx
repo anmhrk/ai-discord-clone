@@ -47,10 +47,12 @@ export default function ServerSidebar({
           {servers.map((server) => {
             const isActive = currentServerId === server?.serverId;
 
-            if (server?.serverImageUrl) {
+            if (!server) return null;
+
+            if (server.serverImageUrl) {
               return (
                 <div
-                  key={server?._id}
+                  key={server._id}
                   className="relative flex items-center justify-center group"
                 >
                   <ActiveIndicator isActive={isActive} />
@@ -60,12 +62,12 @@ export default function ServerSidebar({
                     }`}
                     onClick={() =>
                       router.push(
-                        `/channels/${server?.serverId}/${server?.defaultChannelId}`
+                        `/channels/${server.serverId}/${server.defaultChannelId}`
                       )
                     }
                   >
                     <Image
-                      src={server?.serverImageUrl}
+                      src={server.serverImageUrl}
                       alt="Server Image"
                       width={48}
                       height={48}
@@ -78,7 +80,7 @@ export default function ServerSidebar({
 
             return (
               <div
-                key={server?._id}
+                key={server._id}
                 className="relative flex items-center justify-center group"
               >
                 <ActiveIndicator isActive={isActive} />
@@ -90,13 +92,13 @@ export default function ServerSidebar({
                   }`}
                   onClick={() =>
                     router.push(
-                      `/channels/${server?.serverId}/${server?.defaultChannelId}`
+                      `/channels/${server.serverId}/${server.defaultChannelId}`
                     )
                   }
                 >
                   <div className="w-6 h-6 flex items-center justify-center">
                     <span className="text-white font-medium">
-                      {server?.name
+                      {server.name
                         .split(" ")
                         .map((word) => word.charAt(0))
                         .join("")}

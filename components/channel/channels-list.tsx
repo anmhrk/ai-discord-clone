@@ -30,7 +30,7 @@ export default function ChannelsList({
     <div className="w-60 bg-[#2B2D31] flex flex-col min-h-screen">
       <button className="h-12 px-4 flex items-center justify-between bg-[#2B2D31] hover:bg-[#36373C] transition-colors">
         <span className="font-semibold text-[15px] text-[#DCDEE1]">
-          {serverData?.name}
+          {serverData?.server.name}
         </span>
         <ChevronDown className="w-5 h-5 text-[#B5BAC1]" />
       </button>
@@ -62,7 +62,7 @@ export default function ChannelsList({
                     )}
                     onClick={() => {
                       router.push(
-                        `/channels/${serverData?.serverId}/${channel.channelId}`
+                        `/channels/${serverData?.server.serverId}/${channel.channelId}`
                       );
                     }}
                   >
