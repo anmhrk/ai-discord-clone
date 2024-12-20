@@ -107,3 +107,45 @@ export const deleteFriend = mutation({
     await ctx.db.delete(friend._id);
   },
 });
+
+export const checkIfUserCreatedFriend = mutation({
+  args: {
+    friendId: v.string(),
+    userId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const friend = await ctx.db
+      .query("friends")
+      .filter((q) => {
+        return q.eq(q.field("friendId"), args.friendId);
+      })
+      .first();
+
+    if (!friend) {
+      return false;
+    }
+
+    const user = await ctx.db
+      .query("users")
+      .filter((q) => {
+        return q.eq(q.field("userId"), args.userId);
+      })
+      .first();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const userCreatedFriend = await ctx.db
+      .query("friends")
+      .filter((q) => {
+        return q.and(
+          q.eq(q.field("creatorId"), user._id),
+          q.eq(q.field("friendId"), args.friendId)
+        );
+      })
+      .first();
+
+    return userCreatedFriend ? true : false;
+  },
+});

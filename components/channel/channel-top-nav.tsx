@@ -20,7 +20,7 @@ export default function ChannelTopNav({
   const channelName =
     channels && noChannelSelected
       ? channels?.find(
-          (channel) => channel.channelId === serverData?.defaultChannelId
+          (channel) => channel.channelId === serverData?.server.defaultChannelId
         )?.name
       : channels && params.channelId
         ? channels?.find((channel) => channel.channelId === params.channelId)

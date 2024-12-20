@@ -8,7 +8,7 @@ import UserInfo from "@/components/common/user-info";
 import { Preloaded, usePreloadedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 export default function FriendsList({
   preloadedUserData,
@@ -20,6 +20,7 @@ export default function FriendsList({
   const userData = usePreloadedQuery(preloadedUserData);
   const friends = usePreloadedQuery(preloadedFriends);
   const router = useRouter();
+  const params = useParams<{ id: string }>();
 
   return (
     <div className="w-60 bg-[#2B2D31] flex flex-col min-h-screen">
@@ -49,7 +50,9 @@ export default function FriendsList({
             ? friends.map((friend) => (
                 <button
                   key={friend?._id || ""}
-                  className="flex items-center px-2 py-[4px] gap-3 w-full hover:bg-[#36373C] rounded-sm group"
+                  className={`flex items-center px-2 py-[4px] gap-3 w-full hover:bg-[#36373C] rounded-sm group ${
+                    params.id === friend?.friendId ? "bg-[#36373C]" : ""
+                  }`}
                   onClick={() => {
                     router.push(`/channels/@me/${friend?.friendId}`);
                   }}

@@ -1,7 +1,22 @@
 "use server";
 
 import { api } from "@/convex/_generated/api";
+import { auth } from "@clerk/nextjs/server";
 import { fetchMutation } from "convex/nextjs";
+
+export async function checkIfUserCreatedFriend(friendId: string) {
+  const { userId } = await auth();
+
+  const createdFriend = await fetchMutation(
+    api.friend.checkIfUserCreatedFriend,
+    {
+      userId: userId!,
+      friendId,
+    }
+  );
+
+  return createdFriend;
+}
 
 export async function createFriend(
   userId: string | null,
