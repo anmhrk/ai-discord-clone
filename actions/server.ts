@@ -66,6 +66,7 @@ export async function createServer(
           serverId,
           userId,
           serverImageUrl: url,
+          serverImageStorageId: storageId,
         });
 
         await fetchMutation(api.channel.createChannel, {

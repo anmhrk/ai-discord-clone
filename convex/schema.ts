@@ -21,6 +21,7 @@ export default defineSchema({
     model: v.string(),
     personality: v.string(),
     friendImageUrl: v.optional(v.string()),
+    friendImageStorageId: v.optional(v.string()),
     updatedAt: v.optional(v.number()),
     profileColor: v.optional(v.string()),
   })
@@ -34,6 +35,7 @@ export default defineSchema({
     serverId: v.string(),
     ownerId: v.id("users"),
     serverImageUrl: v.optional(v.string()),
+    serverImageStorageId: v.optional(v.string()),
     updatedAt: v.optional(v.number()),
     defaultChannelId: v.string(),
   })

@@ -1,3 +1,4 @@
+import { Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import { ConvexError, v } from "convex/values";
 
@@ -10,6 +11,7 @@ export const createFriend = mutation({
     model: v.string(),
     personality: v.string(),
     friendImageUrl: v.optional(v.string()),
+    friendImageStorageId: v.optional(v.string()),
     profileColor: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
@@ -44,6 +46,7 @@ export const createFriend = mutation({
         model: args.model,
         personality: args.personality,
         friendImageUrl: args.friendImageUrl,
+        friendImageStorageId: args.friendImageStorageId,
         profileColor: args.profileColor,
       });
     } catch (error) {
@@ -105,6 +108,10 @@ export const deleteFriend = mutation({
     }
 
     await ctx.db.delete(friend._id);
+
+    if (friend.friendImageStorageId) {
+      await ctx.storage.delete(friend.friendImageStorageId as Id<"_storage">);
+    }
   },
 });
 

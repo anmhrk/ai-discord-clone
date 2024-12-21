@@ -1,3 +1,4 @@
+import { Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
@@ -7,6 +8,7 @@ export const createServer = mutation({
     serverId: v.string(),
     userId: v.string(),
     serverImageUrl: v.optional(v.string()),
+    serverImageStorageId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     try {
@@ -26,6 +28,7 @@ export const createServer = mutation({
         serverId: args.serverId,
         ownerId: user._id,
         serverImageUrl: args.serverImageUrl,
+        serverImageStorageId: args.serverImageStorageId,
         defaultChannelId: "",
       });
 
@@ -203,6 +206,10 @@ export const deleteServer = mutation({
       for (const message of channelMessages) {
         await ctx.db.delete(message._id);
       }
+    }
+
+    if (server.serverImageStorageId) {
+      await ctx.storage.delete(server.serverImageStorageId as Id<"_storage">);
     }
   },
 });

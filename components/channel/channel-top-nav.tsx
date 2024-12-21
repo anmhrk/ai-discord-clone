@@ -3,7 +3,7 @@
 import { api } from "@/convex/_generated/api";
 import { Preloaded, usePreloadedQuery } from "convex/react";
 import { Hash } from "lucide-react";
-import { useParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 export default function ChannelTopNav({
   preloadedServerData,
@@ -12,20 +12,18 @@ export default function ChannelTopNav({
   preloadedServerData: Preloaded<typeof api.server.getServerData>;
   preloadedChannels: Preloaded<typeof api.channel.getChannelsForServer>;
 }) {
-  const params = useParams<{ serverId: string; channelId: string }>();
   const serverData = usePreloadedQuery(preloadedServerData);
   const channels = usePreloadedQuery(preloadedChannels);
-  const noChannelSelected = params.channelId === undefined;
 
+  const pathname = usePathname();
+  const pathSegments = pathname.split("/").filter(Boolean);
+  const channelId =
+    pathSegments.length >= 3
+      ? pathSegments[pathSegments.length - 1]
+      : serverData?.server.defaultChannelId;
   const channelName =
-    channels && noChannelSelected
-      ? channels?.find(
-          (channel) => channel.channelId === serverData?.server.defaultChannelId
-        )?.name
-      : channels && params.channelId
-        ? channels?.find((channel) => channel.channelId === params.channelId)
-            ?.name
-        : "";
+    channels &&
+    (channels?.find((channel) => channel.channelId === channelId)?.name || "");
 
   return (
     <div className="flex flex-col text-zinc-400 min-h-[49px]">

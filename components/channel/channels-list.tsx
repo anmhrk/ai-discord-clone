@@ -6,8 +6,8 @@ import UserInfo from "@/components/common/user-info";
 import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
 import { Preloaded, usePreloadedQuery } from "convex/react";
-import { ChevronDown, Hash, Plus, X } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
+import { ChevronDown, Hash, X } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +18,9 @@ import { FaEdit, FaUserPlus } from "react-icons/fa";
 import { FaCirclePlus } from "react-icons/fa6";
 import { deleteServer } from "@/actions/server";
 import { toast } from "sonner";
+import { useState } from "react";
+import { CreateChannelDialog } from "./create-channel-dialog";
+import { deleteChannel } from "@/actions/channel";
 
 export default function ChannelsList({
   preloadedUserData,
@@ -33,24 +36,37 @@ export default function ChannelsList({
   const serverData = usePreloadedQuery(preloadedServerData);
 
   const router = useRouter();
-  const params = useParams<{ serverId: string; channelId: string }>();
-  const noChannelSelected = params.channelId === undefined;
+  const [openCreateChannelDialog, setOpenCreateChannelDialog] = useState(false);
+  const [openInviteFriendsDialog, setOpenInviteFriendsDialog] = useState(false);
+  const [openEditServerDialog, setOpenEditServerDialog] = useState(false);
+
+  // const params = useParams<{ serverId: string; channelId: string }>(); params.channelId is undefined for some reason
+  // so using pathname
+  const pathname = usePathname();
+  const pathSegments = pathname.split("/").filter(Boolean);
+  const channelId =
+    pathSegments.length >= 3
+      ? pathSegments[pathSegments.length - 1]
+      : serverData?.server.defaultChannelId;
+  const channelName =
+    channels &&
+    (channels?.find((channel) => channel.channelId === channelId)?.name || "");
 
   const dropdownItems = [
     {
       label: "Invite Friends",
       icon: FaUserPlus,
-      onClick: () => {},
+      onClick: () => setOpenInviteFriendsDialog(true),
     },
     {
       label: "Edit Server",
       icon: FaEdit,
-      onClick: () => {},
+      onClick: () => setOpenEditServerDialog(true),
     },
     {
       label: "Create Channel",
       icon: FaCirclePlus,
-      onClick: () => {},
+      onClick: () => setOpenCreateChannelDialog(true),
     },
     {
       label: "Delete Server",
@@ -59,7 +75,7 @@ export default function ChannelsList({
         try {
           router.push("/channels/@me");
           await deleteServer(serverData?.server.serverId);
-          toast.success("YourServer deleted");
+          toast.success("Your server has been deleted");
         } catch (error) {
           toast.error(
             error instanceof Error ? error.message : "Failed to delete server"
@@ -106,20 +122,19 @@ export default function ChannelsList({
                 Text Channels
               </span>
             </button>
-            <button className="flex items-center hover:text-[#DCDEE1]">
-              <Plus className="w-4 h-4 mr-3" />
-            </button>
           </div>
 
           <div className="mt-1.5 px-2.5 space-y-[2px]">
             {channels &&
-              channels.map((channel, idx) => {
+              channels.map((channel) => {
                 return (
                   <button
                     key={channel._id}
                     className={cn(
-                      "flex items-center w-full px-2 h-8 rounded gap-2",
-                      noChannelSelected && idx === 0 && "bg-[#404249]"
+                      "flex items-center w-full px-2 h-8 rounded gap-2 justify-between",
+                      channelName &&
+                        channelName === channel.name &&
+                        "bg-[#404249]"
                     )}
                     onClick={() => {
                       router.push(
@@ -127,10 +142,47 @@ export default function ChannelsList({
                       );
                     }}
                   >
-                    <Hash className="w-5 h-5 text-[#949BA4]" />
-                    <span className="text-[#FFF] text-[15px] font-semibold">
-                      {channel.name}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <Hash className="w-5 h-5 text-[#949BA4]" />
+                      <span
+                        className={cn(
+                          "text-[#949BA4] text-[15px] font-semibold",
+                          channelName &&
+                            channelName === channel.name &&
+                            "text-[#FFF]"
+                        )}
+                      >
+                        {channel.name}
+                      </span>
+                    </div>
+                    <X
+                      className="w-4 h-4 text-[#949BA4] hover:text-[#DCDEE1]"
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        try {
+                          const result = await deleteChannel(
+                            serverData?.server.serverId,
+                            channel.channelId
+                          );
+                          if (result) {
+                            router.push(
+                              `/channels/${serverData?.server.serverId}/${result}`
+                            );
+                          } else {
+                            router.push(
+                              `/channels/${serverData?.server.serverId}/${serverData?.server.defaultChannelId}`
+                            );
+                          }
+                          toast.success("Channel deleted");
+                        } catch (error) {
+                          toast.error(
+                            error instanceof Error
+                              ? error.message
+                              : "Failed to delete channel"
+                          );
+                        }
+                      }}
+                    />
                   </button>
                 );
               })}
@@ -139,6 +191,11 @@ export default function ChannelsList({
       </ScrollArea>
 
       <UserInfo userData={userData} />
+      <CreateChannelDialog
+        open={openCreateChannelDialog}
+        onOpenChange={setOpenCreateChannelDialog}
+        serverId={serverData?.server.serverId}
+      />
     </div>
   );
 }

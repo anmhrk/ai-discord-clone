@@ -78,6 +78,7 @@ export async function createFriend(
           model,
           personality,
           friendImageUrl: url,
+          friendImageStorageId: storageId,
         });
       } else {
         throw new Error("Image upload failed");
