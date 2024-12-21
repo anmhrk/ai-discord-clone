@@ -8,7 +8,7 @@ import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Loader } from "@/components/common/loader";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Hash } from "lucide-react";
 import { createChannel } from "@/actions/channel";
 

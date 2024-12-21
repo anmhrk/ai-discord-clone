@@ -20,3 +20,28 @@ export type ServerMember = {
   username: string;
   memberId: Id<"users"> | Id<"friends">;
 };
+
+export type Friend = {
+  updatedAt?: number | undefined;
+  friendImageUrl?: string | undefined;
+  friendImageStorageId?: string | undefined;
+  profileColor?: string | undefined;
+  name: string;
+  username: string;
+  friendId: string;
+  creatorId: Id<"users">;
+  model: string;
+  personality: string;
+} | null;
+
+export type ServerData = {
+  _id: Id<"servers">;
+  _creationTime: number;
+  updatedAt?: number | undefined;
+  serverImageUrl?: string | undefined;
+  serverImageStorageId?: string | undefined;
+  name: string;
+  serverId: string;
+  ownerId: Id<"users">;
+  defaultChannelId: string;
+};

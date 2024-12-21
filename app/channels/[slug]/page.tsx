@@ -62,6 +62,7 @@ export default async function Page({
             preloadedUserData={preloadedUserData}
             preloadedChannels={preloadedChannels}
             preloadedServerData={preloadedServerData}
+            preloadedFriends={preloadedFriends}
           />
           <div className="flex-1 flex flex-col">
             <ChannelTopNav

@@ -213,3 +213,44 @@ export const deleteServer = mutation({
     }
   },
 });
+
+export const addFriendToServer = mutation({
+  args: {
+    serverId: v.string(),
+    friendId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const server = await ctx.db
+      .query("servers")
+      .filter((q) => {
+        return q.eq(q.field("serverId"), args.serverId);
+      })
+      .first();
+
+    if (!server) {
+      throw new Error("Server not found");
+    }
+
+    const friend = await ctx.db
+      .query("friends")
+      .filter((q) => {
+        return q.eq(q.field("friendId"), args.friendId);
+      })
+      .first();
+
+    if (!friend) {
+      throw new Error("Friend not found");
+    }
+
+    await ctx.db.insert("serverMembers", {
+      name: friend.name,
+      username: friend.username,
+      memberId: friend._id,
+      serverId: server._id,
+      profileImageUrl: friend?.friendImageUrl,
+      profileColor: friend?.profileColor,
+    });
+
+    return true;
+  },
+});

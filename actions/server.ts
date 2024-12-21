@@ -123,4 +123,18 @@ export async function updateServer(
   newServerImage?: File
 ) {}
 
-export async function inviteNewMember(serverId: string, newMemberId: string) {}
+export async function addFriendToServer(serverId: string, friendId: string) {
+  try {
+    const result = await fetchMutation(api.server.addFriendToServer, {
+      serverId,
+      friendId,
+    });
+
+    return result;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error(String(error));
+  }
+}

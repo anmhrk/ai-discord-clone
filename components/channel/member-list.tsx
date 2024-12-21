@@ -19,7 +19,7 @@ export default function MemberList({
           {member.profileImageUrl ? (
             <div className="relative">
               <Image
-                src={member?.profileImageUrl || "/placeholder.svg"}
+                src={member?.profileImageUrl || ""}
                 alt={member.name}
                 width={32}
                 height={32}
@@ -29,7 +29,7 @@ export default function MemberList({
             </div>
           ) : (
             <div
-              className="w-8 h-8 rounded-full flex items-center justify-center"
+              className="w-8 h-8 rounded-full flex items-center justify-center ml-2"
               style={{ backgroundColor: member.profileColor }}
             >
               <div className="relative">
@@ -44,7 +44,7 @@ export default function MemberList({
               </div>
             </div>
           )}
-          <span className="text-[#949BA4] text-[15px] group-hover:text-[#DCDEE1] font-bold">
+          <span className="text-[#949BA4] text-[15px] group-hover:text-[#DCDEE1] font-semibold">
             {member.name}
           </span>
         </button>

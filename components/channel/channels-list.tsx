@@ -21,23 +21,27 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { CreateChannelDialog } from "./create-channel-dialog";
 import { deleteChannel } from "@/actions/channel";
+import AddFriendsDialog from "../server/add-friends-dialog";
 
 export default function ChannelsList({
   preloadedUserData,
   preloadedChannels,
   preloadedServerData,
+  preloadedFriends,
 }: {
   preloadedUserData: Preloaded<typeof api.user.getUserData>;
   preloadedChannels: Preloaded<typeof api.channel.getChannelsForServer>;
   preloadedServerData: Preloaded<typeof api.server.getServerData>;
+  preloadedFriends: Preloaded<typeof api.friend.getFriendsForUser>;
 }) {
   const userData = usePreloadedQuery(preloadedUserData);
   const channels = usePreloadedQuery(preloadedChannels);
   const serverData = usePreloadedQuery(preloadedServerData);
+  const friends = preloadedFriends ? usePreloadedQuery(preloadedFriends) : [];
 
   const router = useRouter();
   const [openCreateChannelDialog, setOpenCreateChannelDialog] = useState(false);
-  const [openInviteFriendsDialog, setOpenInviteFriendsDialog] = useState(false);
+  const [openAddFriendsDialog, setOpenAddFriendsDialog] = useState(false);
   const [openEditServerDialog, setOpenEditServerDialog] = useState(false);
 
   // const params = useParams<{ serverId: string; channelId: string }>(); params.channelId is undefined for some reason
@@ -54,19 +58,19 @@ export default function ChannelsList({
 
   const dropdownItems = [
     {
-      label: "Invite Friends",
+      label: "Add Friends",
       icon: FaUserPlus,
-      onClick: () => setOpenInviteFriendsDialog(true),
-    },
-    {
-      label: "Edit Server",
-      icon: FaEdit,
-      onClick: () => setOpenEditServerDialog(true),
+      onClick: () => setOpenAddFriendsDialog(true),
     },
     {
       label: "Create Channel",
       icon: FaCirclePlus,
       onClick: () => setOpenCreateChannelDialog(true),
+    },
+    {
+      label: "Edit Server",
+      icon: FaEdit,
+      onClick: () => setOpenEditServerDialog(true),
     },
     {
       label: "Delete Server",
@@ -195,6 +199,13 @@ export default function ChannelsList({
         open={openCreateChannelDialog}
         onOpenChange={setOpenCreateChannelDialog}
         serverId={serverData?.server.serverId}
+      />
+      <AddFriendsDialog
+        open={openAddFriendsDialog}
+        onOpenChange={setOpenAddFriendsDialog}
+        friends={friends}
+        serverData={serverData?.server}
+        serverMembers={serverData?.serverMembers}
       />
     </div>
   );
