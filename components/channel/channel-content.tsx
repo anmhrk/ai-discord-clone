@@ -3,26 +3,39 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import MemberList from "./member-list";
 import { FaSmile } from "react-icons/fa";
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api } from "@/convex/_generated/api";
 import { Preloaded, usePreloadedQuery } from "convex/react";
 import { useParams } from "next/navigation";
-import { Textarea } from "@/components/ui/textarea";
+import { useChat } from "ai/react";
+import Image from "next/image";
+import { formatTime, splitMessages } from "@/lib/utils";
+import EmojiPicker, { Theme } from "emoji-picker-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function ChannelContent({
   preloadedServerData,
   preloadedChannels,
+  preloadedFriends,
+  preloadedUserData,
 }: {
   preloadedServerData: Preloaded<typeof api.server.getServerData>;
   preloadedChannels: Preloaded<typeof api.channel.getChannelsForServer>;
+  preloadedFriends: Preloaded<typeof api.friend.getFriendsForUser>;
+  preloadedUserData: Preloaded<typeof api.user.getUserData>;
 }) {
   const params = useParams<{ serverId: string; channelId: string }>();
   const serverData = usePreloadedQuery(preloadedServerData);
   const channels = usePreloadedQuery(preloadedChannels);
+  const friends = preloadedFriends ? usePreloadedQuery(preloadedFriends) : [];
+  const userData = usePreloadedQuery(preloadedUserData);
   const noChannelSelected = params.channelId === undefined;
 
-  const [message, setMessage] = useState("");
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   const channelName =
     channels && noChannelSelected
@@ -34,42 +47,49 @@ export default function ChannelContent({
             ?.name
         : "";
 
-  // const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { messages, input, handleInputChange, handleSubmit } = useChat({
+    body: {
+      friends: friends
+        .map((friend) => ({
+          id: friend?._id,
+          name:
+            serverData?.serverMembers.find(
+              (member) => member.memberId === friend?._id
+            )?.name ?? "",
+          personality: friend?.personality,
+        }))
+        .filter((friend) => friend.name),
+    },
+  });
 
-  // const scrollToBottom = () => {
-  //   messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  // };
-
-  // const scrollToBottomInstant = () => {
-  //   messagesEndRef.current?.scrollIntoView({ behavior: "instant" });
-  // };
-
-  // // Initial scroll on mount - instant
-  // useEffect(() => {
-  //   scrollToBottomInstant();
-  // }, []);
-
-  // // Smooth scroll when messages change
-  // useEffect(() => {
-  //   if (messages.length > 0) {
-  //     scrollToBottom();
-  //   }
-  // }, [messages]);
-
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "0px";
-      const scrollHeight = textareaRef.current.scrollHeight;
-      textareaRef.current.style.height = scrollHeight + "px";
-    }
-  }, [message]);
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      // call send message server action
-    }
+  const handleEmojiClick = (emojiData: any) => {
+    handleInputChange({
+      target: { value: input + emojiData.emoji },
+    } as React.ChangeEvent<HTMLInputElement>);
+    setShowEmojiPicker(false);
   };
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const scrollToBottomInstant = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "instant" });
+  };
+
+  // initial scroll on mount - instant
+  useEffect(() => {
+    scrollToBottomInstant();
+  }, []);
+
+  // smooth scroll when messages overflow
+  useEffect(() => {
+    if (messages.length > 0) {
+      scrollToBottom();
+    }
+  }, [messages]);
 
   return (
     <div className="flex-1 flex flex-row">
@@ -90,9 +110,99 @@ export default function ChannelContent({
                     your AI friends!
                   </p>
                 </div>
-                <div className="flex flex-col gap-2 px-4 pb-4">
-                  {/* map messages here */}
-                  {/* <div ref={messagesEndRef} /> */}
+                <div className="flex flex-col gap-2 px-4 pb-0.5">
+                  {messages.map((message) => {
+                    if (message.role === "user") {
+                      return (
+                        <div
+                          key={message.id}
+                          className="flex gap-4 py-[2px] hover:bg-[#2D3035]"
+                        >
+                          <div className="w-10 h-10 rounded-full flex-shrink-0">
+                            <Image
+                              src={userData?.profileImageUrl || ""}
+                              alt="user avatar"
+                              width={40}
+                              height={40}
+                              className="w-full h-full rounded-full object-cover"
+                            />
+                          </div>
+                          <div className="flex flex-col">
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold text-[15px] text-[#F2F3F5]">
+                                {userData?.name}
+                              </span>
+                              <span className="text-[11.5px] font-medium text-[#949BA4]">
+                                {formatTime()}
+                              </span>
+                            </div>
+                            <div className="text-[#DBDEE1] text-[15px]">
+                              {message.content}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    return splitMessages(message.content).map(
+                      (aiMessage, index) => {
+                        const friend = friends.find(
+                          (f) =>
+                            serverData?.serverMembers.find(
+                              (m) => m.memberId === f?._id
+                            )?.name === aiMessage.name
+                        );
+
+                        return (
+                          <div
+                            key={`${message.id}-${index}`}
+                            className="flex gap-4 py-[2px] hover:bg-[#2D3035]"
+                          >
+                            {friend?.friendImageUrl ? (
+                              <div className="w-10 h-10 rounded-full flex-shrink-0">
+                                <Image
+                                  src={friend.friendImageUrl}
+                                  alt={aiMessage.name}
+                                  width={40}
+                                  height={40}
+                                  className="w-full h-full rounded-full object-cover"
+                                />
+                              </div>
+                            ) : (
+                              <div
+                                className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center"
+                                style={{
+                                  backgroundColor: friend?.profileColor || "",
+                                }}
+                              >
+                                <Image
+                                  src="/logo-white.svg"
+                                  alt="Logo"
+                                  width={32}
+                                  height={32}
+                                  className="w-6 h-6 rounded-full"
+                                />
+                              </div>
+                            )}
+                            <div className="flex flex-col">
+                              <div className="flex items-center gap-2">
+                                <span className="font-semibold text-[15px] text-[#F2F3F5]">
+                                  {aiMessage.name}
+                                </span>
+                                <span className="text-[11.5px] font-medium text-[#949BA4]">
+                                  {formatTime()}
+                                </span>
+                              </div>
+                              <div className="text-[#DBDEE1] text-[15px]">
+                                {aiMessage.message}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      }
+                    );
+                  })}
+                  <div ref={messagesEndRef} />
                 </div>
               </div>
             </div>
@@ -100,16 +210,37 @@ export default function ChannelContent({
         </ScrollArea>
         <div className="flex-shrink-0 px-4 pb-6 mt-2">
           <div className="flex items-center gap-4 bg-[#383A40] rounded-lg px-3 py-0.5 min-h-[44px]">
-            <Textarea
-              ref={textareaRef}
-              placeholder={`Message #${channelName}`}
-              className="resize-none max-h-[420px] flex-1 bg-[#383A40] font-medium border-none text-[#DCDEE1] placeholder:text-[#6D6F78]"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyDown={handleKeyDown}
-              rows={1}
-            />
-            <FaSmile className="w-6 h-6 text-[#B3B7BE] hover:text-[#FCC145] cursor-pointer flex-shrink-0" />
+            <form
+              onSubmit={handleSubmit}
+              className="flex items-center w-full gap-4"
+            >
+              <input
+                name="prompt"
+                value={input}
+                onChange={handleInputChange}
+                placeholder={`Message #${channelName}`}
+                className="text-[15px] flex-1 bg-[#383A40] font-medium border-none text-[#DCDEE1] placeholder:text-[#6D6F78] focus:outline-none w-full"
+              />
+              <DropdownMenu
+                open={showEmojiPicker}
+                onOpenChange={setShowEmojiPicker}
+              >
+                <DropdownMenuTrigger asChild>
+                  <FaSmile className="w-6 h-6 text-[#B3B7BE] hover:text-[#FCC145] cursor-pointer flex-shrink-0" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  side="top"
+                  align="end"
+                  className="p-0 border-none bg-transparent"
+                >
+                  <EmojiPicker
+                    onEmojiClick={handleEmojiClick}
+                    lazyLoadEmojis={true}
+                    theme={Theme.DARK}
+                  />
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </form>
           </div>
         </div>
       </div>

@@ -21,7 +21,6 @@ export async function checkIfUserCreatedFriend(friendId: string) {
 export async function createFriend(
   userId: string | null,
   friendName: string,
-  model: string,
   personality: string,
   friendImage: File | null
 ) {
@@ -75,7 +74,6 @@ export async function createFriend(
           friendId,
           name: friendName,
           username: friendUsername,
-          model,
           personality,
           friendImageUrl: url,
           friendImageStorageId: storageId,
@@ -89,7 +87,6 @@ export async function createFriend(
         friendId,
         name: friendName,
         username: friendUsername,
-        model,
         personality,
         profileColor: randomProfileColor,
       });

@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Not Discord",
-  description: "An AI Discord clone",
+  description: "Discord clone, but with AI friends",
 };
 
 export default function RootLayout({

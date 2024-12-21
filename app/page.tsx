@@ -13,7 +13,7 @@ export default function Home() {
           className="animate-bounce-slow"
         />
         <h1 className="text-xl md:text-3xl text-center font-semibold text-zinc-200">
-          Discord clone, but your friends are AI models
+          Discord clone, but with AI friends
         </h1>
         <Link
           href="/channels/@me"

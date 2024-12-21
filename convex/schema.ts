@@ -18,7 +18,6 @@ export default defineSchema({
     creatorId: v.id("users"),
     name: v.string(),
     username: v.string(),
-    model: v.string(),
     personality: v.string(),
     friendImageUrl: v.optional(v.string()),
     friendImageStorageId: v.optional(v.string()),
@@ -66,12 +65,8 @@ export default defineSchema({
 
   channelMessages: defineTable({
     channelId: v.id("channels"),
-    senderId: v.id("users"),
+    senderId: v.union(v.id("users"), v.id("friends")),
     content: v.string(),
-    replyTo: v.optional(v.id("channelMessages")),
-    isEdited: v.optional(v.boolean()),
-    editedAt: v.optional(v.number()),
-    deletedAt: v.optional(v.number()),
   })
     .index("by_channelId", ["channelId"])
     .index("by_senderId", ["senderId"]),

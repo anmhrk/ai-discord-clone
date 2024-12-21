@@ -8,7 +8,6 @@ export const createFriend = mutation({
     friendId: v.string(),
     name: v.string(),
     username: v.string(),
-    model: v.string(),
     personality: v.string(),
     friendImageUrl: v.optional(v.string()),
     friendImageStorageId: v.optional(v.string()),
@@ -43,7 +42,6 @@ export const createFriend = mutation({
         friendId: args.friendId,
         name: args.name,
         username: args.username,
-        model: args.model,
         personality: args.personality,
         friendImageUrl: args.friendImageUrl,
         friendImageStorageId: args.friendImageStorageId,
@@ -108,6 +106,17 @@ export const deleteFriend = mutation({
     }
 
     await ctx.db.delete(friend._id);
+
+    const serverMembers = await ctx.db
+      .query("serverMembers")
+      .filter((q) => {
+        return q.eq(q.field("memberId"), friend._id);
+      })
+      .collect();
+
+    for (const serverMember of serverMembers) {
+      await ctx.db.delete(serverMember._id);
+    }
 
     if (friend.friendImageStorageId) {
       await ctx.storage.delete(friend.friendImageStorageId as Id<"_storage">);

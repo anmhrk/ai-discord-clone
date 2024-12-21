@@ -30,7 +30,6 @@ export type Friend = {
   username: string;
   friendId: string;
   creatorId: Id<"users">;
-  model: string;
   personality: string;
 } | null;
 

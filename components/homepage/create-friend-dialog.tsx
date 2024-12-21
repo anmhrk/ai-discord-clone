@@ -12,13 +12,6 @@ import { Input } from "@/components/ui/input";
 import { createFriend } from "@/actions/friend";
 import Image from "next/image";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 export default function CreateFriendDialog({
   open,
@@ -33,12 +26,9 @@ export default function CreateFriendDialog({
   const [friendProfileImage, setFriendProfileImage] = useState<File | null>(
     null
   );
-  const [model, setModel] = useState("");
   const [personality, setPersonality] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const models = ["gpt-4o", "gemini-2.0-flash", "grok"];
 
   return (
     <Dialog
@@ -47,7 +37,6 @@ export default function CreateFriendDialog({
         onOpenChange(open);
         if (!open) {
           setName("");
-          setModel("");
           setPersonality("");
           setFriendProfileImage(null);
           setError(null);
@@ -120,31 +109,6 @@ export default function CreateFriendDialog({
             />
             <div className="flex items-center">
               <label className="uppercase text-xs font-bold text-[#B5BAC1] block">
-                AI Model
-              </label>
-              <span className="text-[#ED4245] ml-1">*</span>
-            </div>
-            <Select value={model} onValueChange={setModel}>
-              <SelectTrigger className="bg-[#1E1F22] font-medium text-[#DCDEE1] border-none focus:ring-0 placeholder:text-[#4E5058] h-10">
-                <SelectValue
-                  className="text-[#4E5058] font-medium"
-                  placeholder="Select AI Model"
-                />
-              </SelectTrigger>
-              <SelectContent className="bg-[#1E1F22] border-none">
-                {models.map((model, idx) => (
-                  <SelectItem
-                    key={idx}
-                    value={model}
-                    className="text-[#DCDEE1] font-medium h-10 focus:text-[#DCDEE1] focus:bg-[#404249]"
-                  >
-                    {model}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <div className="flex items-center">
-              <label className="uppercase text-xs font-bold text-[#B5BAC1] block">
                 Personality
               </label>
               <span className="text-[#ED4245] ml-1">*</span>
@@ -167,18 +131,17 @@ export default function CreateFriendDialog({
           )}
           <button
             className={`min-w-[100px] h-[38px] text-white text-[14px] rounded-sm transition-colors flex items-center justify-center ${
-              !personality || !name || !model
+              !personality || !name
                 ? "bg-[#424993] cursor-not-allowed"
                 : "hover:bg-[#4752C4] bg-[#5865F2]"
             }`}
-            disabled={!personality || !name || !model}
+            disabled={!personality || !name}
             onClick={async () => {
               setLoading(true);
               try {
                 await createFriend(
                   userData?.userId ?? null,
                   name,
-                  model,
                   personality,
                   friendProfileImage
                 );
