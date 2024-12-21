@@ -82,9 +82,31 @@ export async function POST(req: Request) {
 
     case "user.updated":
       try {
+        await fetchMutation(api.user.updateUser, {
+          userId: payload.data.id,
+          profileImageUrl: payload.data.image_url,
+        });
+
         return NextResponse.json({
           status: 200,
           message: "User info updated",
+        });
+      } catch (error: any) {
+        return NextResponse.json({
+          status: 400,
+          message: error.message,
+        });
+      }
+
+    case "user.deleted":
+      try {
+        await fetchMutation(api.user.deleteUser, {
+          userId: payload.data.id,
+        });
+
+        return NextResponse.json({
+          status: 200,
+          message: "User info deleted",
         });
       } catch (error: any) {
         return NextResponse.json({

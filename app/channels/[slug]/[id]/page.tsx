@@ -18,6 +18,10 @@ export default async function Page({
   const { slug, id } = await params;
   const { userId } = await auth();
 
+  if (!userId) {
+    return redirect("/channels/@me");
+  }
+
   const preloadedUserData = await preloadQuery(api.user.getUserData, {
     userId: userId!,
   });

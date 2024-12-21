@@ -1,20 +1,24 @@
 import { UserData } from "@/lib/types";
+import { useClerk } from "@clerk/nextjs";
 import { Headphones, Mic, Settings } from "lucide-react";
-import Image from "next/image";
+import { UserButton } from "@clerk/nextjs";
 
 export default function UserInfo({ userData }: { userData: UserData }) {
+  const { openUserProfile } = useClerk();
+
   return (
     <div className="px-1 py-[6px] bg-[#232428] flex items-center justify-between gap-2 min-h-[52px] group">
       <div className="px-1 flex items-center gap-2 hover:bg-[#35373C] w-full rounded-[4px] cursor-pointer">
         <div className="relative">
-          <Image
-            src={userData?.profileImageUrl || "/placeholder.svg"}
+          {/* <Image
+            src={userData?.profileImageUrl || ""}
             alt={userData?.name || ""}
             width={32}
             height={32}
             className="w-8 h-8 rounded-full"
-          />
-          <div className="w-3.5 h-3.5 bg-green-500 rounded-full absolute bottom-[-2px] right-0 border-[2px] border-[#232428]" />
+          /> */}
+          <UserButton appearance={{ elements: { rootBox: "w-8 h-8" } }} />
+          <div className="w-3.5 h-3.5 bg-green-500 rounded-full absolute bottom-[2px] right-0 border-[2px] border-[#232428]" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="text-sm font-semibold truncate text-[#DBDEE1]">
@@ -37,7 +41,10 @@ export default function UserInfo({ userData }: { userData: UserData }) {
         <button className="p-[6px] rounded-[4px] hover:bg-[#35373C] text-[#B5BAC1] hover:text-[#DBDEE1]">
           <Headphones className="w-5 h-5" />
         </button>
-        <button className="p-[6px] rounded-[4px] hover:bg-[#35373C] text-[#B5BAC1] hover:text-[#DBDEE1]">
+        <button
+          className="p-[6px] rounded-[4px] hover:bg-[#35373C] text-[#B5BAC1] hover:text-[#DBDEE1]"
+          onClick={() => openUserProfile()}
+        >
           <Settings className="w-5 h-5" />
         </button>
       </div>
