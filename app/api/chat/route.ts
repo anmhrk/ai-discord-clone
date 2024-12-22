@@ -43,12 +43,6 @@ export async function POST(req: Request) {
     const coreMessages = convertToCoreMessages(messages);
 
     if (friends.length === 1) {
-      console.log("Direct Message Mode - Initial Data:", {
-        friendData: friends[0],
-        messageCount: messages.length,
-        userId,
-      });
-
       const { name, personality } = friends[0];
 
       try {
@@ -57,11 +51,6 @@ export async function POST(req: Request) {
           system: `${systemPrompt(name, personality)}`,
           messages: coreMessages,
           onFinish: async ({ response }) => {
-            console.log("AI Response Structure:", {
-              responseLength: response.messages.length,
-              lastMessage: response.messages[response.messages.length - 1],
-            });
-
             try {
               const existingMessages = await fetchQuery(
                 api.message.getMessages,
@@ -70,20 +59,10 @@ export async function POST(req: Request) {
                   userId: userId,
                 }
               );
-              console.log("Existing Messages:", {
-                count: existingMessages?.length || 0,
-                lastMessage: existingMessages?.[existingMessages.length - 1],
-              });
 
               const lastUserMessage = coreMessages[coreMessages.length - 1];
               const lastAIMessage =
                 response.messages[response.messages.length - 1];
-
-              console.log("Message Processing:", {
-                lastUserMessage,
-                lastAIMessage,
-                timestamp: Date.now(),
-              });
 
               const updatedMessages = [
                 ...(existingMessages || []),
@@ -91,41 +70,20 @@ export async function POST(req: Request) {
                 { ...lastAIMessage, timestamp: Date.now() + 1 },
               ];
 
-              console.log("Updated Messages Array:", {
-                totalCount: updatedMessages.length,
-                lastTwoMessages: updatedMessages.slice(-2),
-              });
-
               await fetchMutation(api.message.createMessages, {
                 id: id,
                 messages: updatedMessages,
                 userId: userId,
               });
-              console.log("Messages successfully saved to database");
             } catch (error) {
-              console.error("Error in onFinish callback:", {
-                error,
-                errorMessage:
-                  error instanceof Error ? error.message : "Unknown error",
-                errorStack: error instanceof Error ? error.stack : undefined,
-              });
-              throw error; // Re-throw to ensure the error is properly handled
+              console.error("Error in onFinish:", error);
             }
           },
         });
 
-        console.log("StreamText completed successfully");
         return result.toDataStreamResponse();
       } catch (error) {
-        console.error("Error in Direct Message handling:", {
-          error,
-          errorMessage:
-            error instanceof Error ? error.message : "Unknown error",
-          errorStack: error instanceof Error ? error.stack : undefined,
-          friends: friends[0],
-          messageCount: messages.length,
-        });
-        throw error; // Re-throw to ensure the error is properly handled
+        console.error("Error:", error);
       }
     }
 
@@ -156,9 +114,10 @@ export async function POST(req: Request) {
               .slice(0, Math.floor(Math.random() * 2) + 1);
     }
 
-    const result = streamText({
-      model: xai("grok-2-1212"),
-      system: `${systemPrompt(respondingFriends[0].name, respondingFriends[0].personality)}
+    try {
+      const result = streamText({
+        model: xai("grok-2-1212"),
+        system: `${systemPrompt(respondingFriends[0].name, respondingFriends[0].personality)}
       Additional context: You are in a group chat with the following participants: ${respondingFriends
         .map((f: Friend) => f.name)
         .join(", ")}. 
@@ -168,37 +127,41 @@ export async function POST(req: Request) {
       - not everyone needs to respond in a strict order
       - respond as if in a real group chat where people chime in naturally
       ${isEveryoneMentioned(latestMessage.content) ? "Since @everyone was mentioned, ensure ALL participants respond to the message at least once." : ""}`,
-      messages: coreMessages,
-      onFinish: async ({ response }) => {
-        try {
-          const existingMessages = await fetchQuery(api.message.getMessages, {
-            id: id,
-            userId: userId,
-          });
+        messages: coreMessages,
+        onFinish: async ({ response }) => {
+          try {
+            const existingMessages = await fetchQuery(api.message.getMessages, {
+              id: id,
+              userId: userId,
+            });
 
-          const lastUserMessage = coreMessages[coreMessages.length - 1];
-          const lastAIMessage = response.messages[response.messages.length - 1];
+            const lastUserMessage = coreMessages[coreMessages.length - 1];
+            const lastAIMessage =
+              response.messages[response.messages.length - 1];
 
-          const updatedMessages = [
-            ...(existingMessages || []),
-            { ...lastUserMessage, timestamp: Date.now() },
-            { ...lastAIMessage, timestamp: Date.now() + 1 },
-          ];
+            const updatedMessages = [
+              ...(existingMessages || []),
+              { ...lastUserMessage, timestamp: Date.now() },
+              { ...lastAIMessage, timestamp: Date.now() + 1 },
+            ];
 
-          await fetchMutation(api.message.createMessages, {
-            id: id,
-            messages: updatedMessages,
-            userId: userId,
-          });
-        } catch (error) {
-          console.error("Error saving group chat messages:", error);
-        }
-      },
-    });
+            await fetchMutation(api.message.createMessages, {
+              id: id,
+              messages: updatedMessages,
+              userId: userId,
+            });
+          } catch (error) {
+            console.error("Error in onFinish:", error);
+          }
+        },
+      });
 
-    return result.toDataStreamResponse();
+      return result.toDataStreamResponse();
+    } catch (error) {
+      console.error("Error:", error);
+    }
   } catch (error) {
-    +console.error("Main Route Catch Block error:", error);
+    console.error("Main catch block error:", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : JSON.stringify(error) },
       { status: 500 }
