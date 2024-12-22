@@ -1,4 +1,5 @@
 import { ServerMember } from "@/lib/types";
+import { FaCrown } from "react-icons/fa";
 import Image from "next/image";
 
 export default function MemberList({
@@ -44,8 +45,11 @@ export default function MemberList({
               </div>
             </div>
           )}
-          <span className="text-[#949BA4] text-[15px] group-hover:text-[#DCDEE1] font-semibold">
+          <span className="text-[#949BA4] text-[15px] group-hover:text-[#DCDEE1] font-semibold flex items-center gap-1.5">
             {member.name}
+            {member.memberId === serverMembers[0].memberId && (
+              <FaCrown className="w-3.5 h-3.5 text-[#F0B233]" />
+            )}
           </span>
         </button>
       ))}

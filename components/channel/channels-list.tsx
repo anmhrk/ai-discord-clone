@@ -42,7 +42,6 @@ export default function ChannelsList({
   const router = useRouter();
   const [openCreateChannelDialog, setOpenCreateChannelDialog] = useState(false);
   const [openAddFriendsDialog, setOpenAddFriendsDialog] = useState(false);
-  const [openEditServerDialog, setOpenEditServerDialog] = useState(false);
 
   // const params = useParams<{ serverId: string; channelId: string }>(); params.channelId is undefined for some reason
   // so using pathname
@@ -66,11 +65,6 @@ export default function ChannelsList({
       label: "Create Channel",
       icon: FaCirclePlus,
       onClick: () => setOpenCreateChannelDialog(true),
-    },
-    {
-      label: "Edit Server",
-      icon: FaEdit,
-      onClick: () => setOpenEditServerDialog(true),
     },
     {
       label: "Delete Server",
@@ -195,17 +189,17 @@ export default function ChannelsList({
       </ScrollArea>
 
       <UserInfo userData={userData} />
-      <CreateChannelDialog
-        open={openCreateChannelDialog}
-        onOpenChange={setOpenCreateChannelDialog}
-        serverId={serverData?.server.serverId}
-      />
       <AddFriendsDialog
         open={openAddFriendsDialog}
         onOpenChange={setOpenAddFriendsDialog}
         friends={friends}
         serverData={serverData?.server}
         serverMembers={serverData?.serverMembers}
+      />
+      <CreateChannelDialog
+        open={openCreateChannelDialog}
+        onOpenChange={setOpenCreateChannelDialog}
+        serverId={serverData?.server.serverId}
       />
     </div>
   );

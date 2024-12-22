@@ -116,13 +116,6 @@ export async function deleteServer(serverId: string) {
   }
 }
 
-export async function updateServer(
-  serverId: string,
-  userId: string,
-  newServerName?: string,
-  newServerImage?: File
-) {}
-
 export async function addFriendToServer(serverId: string, friendId: string) {
   try {
     const result = await fetchMutation(api.server.addFriendToServer, {

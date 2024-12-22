@@ -49,8 +49,7 @@ export default function CreateFriendDialog({
             Create Your AI Friend
           </DialogTitle>
           <p className="text-[#B5BAC1] text-center font-medium mt-2 px-6 text-[14px] leading-[18px]">
-            Customize your new AI friend here. You can always change these
-            settings later.
+            Customize your new AI friend here. Be creative!
           </p>
         </DialogHeader>
 

@@ -8,8 +8,6 @@ import { api } from "@/convex/_generated/api";
 import { Preloaded, usePreloadedQuery } from "convex/react";
 import { usePathname } from "next/navigation";
 import { useChat } from "ai/react";
-import Image from "next/image";
-import { formatTime, splitMessages } from "@/lib/utils";
 import EmojiPicker, { Theme } from "emoji-picker-react";
 import {
   DropdownMenu,
@@ -17,9 +15,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useQuery } from "convex/react";
-import { Skeleton } from "@/components/ui/skeleton";
-import Loading from "@/app/loading";
 import { Loader } from "../common/loader";
+import { toast } from "sonner";
+import Messages from "../common/messages";
 
 export default function ChannelContent({
   preloadedServerData,
@@ -79,6 +77,17 @@ export default function ChannelContent({
     }
   }, [storedMessages]);
 
+  const messagesEndRef = useRef<HTMLDivElement>(null!);
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      messagesEndRef.current?.scrollIntoView({
+        behavior: "auto",
+        block: "end",
+      });
+    }
+  }, [messages]);
+
   const handleEmojiClick = (emojiData: any) => {
     handleInputChange({
       target: { value: input + emojiData.emoji },
@@ -86,228 +95,55 @@ export default function ChannelContent({
     setShowEmojiPicker(false);
   };
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const scrollToBottomInstant = () => {
-    messagesEndRef.current?.scrollIntoView({ block: "end", behavior: "auto" });
-  };
-
-  useEffect(() => {
-    scrollToBottomInstant();
-  }, []);
-
-  useEffect(() => {
-    if (messages.length > 0) {
-      scrollToBottom();
-    }
-  }, [messages]);
-
   return (
     <div className="flex-1 flex flex-row">
       <div className="flex-1 flex flex-col h-full">
-        <ScrollArea className="flex-1 relative overflow-hidden min-h-0">
-          <div className="absolute inset-0 overflow-y-auto">
-            <div className="flex flex-col justify-end min-h-full">
-              <div className="flex flex-col">
-                <div className="max-w-sm mx-auto py-8 text-center">
-                  <p className="text-3xl font-bold text-[#DCDEE1] mb-1">
-                    Welcome to
-                  </p>
-                  <p className="text-3xl font-bold text-[#DCDEE1] mb-3">
-                    {serverData?.server.name}
-                  </p>
-                  <p className="text-[#B5BAC1] text-sm">
-                    This is your brand new, shiny server. Have fun chatting with
-                    your AI friends!
-                  </p>
-                </div>
-                <div className="flex flex-col gap-2 px-4 pb-0.5">
-                  {isLoading ? (
-                    <div className="flex flex-col items-center justify-center h-screen">
-                      <Loader />
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center h-screen">
+            <Loader />
+          </div>
+        ) : (
+          <>
+            <ScrollArea className="flex-1 relative overflow-hidden min-h-0">
+              <div className="absolute inset-0 overflow-y-auto">
+                <div className="flex flex-col justify-end min-h-full">
+                  <div className="flex flex-col">
+                    <div className="max-w-sm mx-auto py-8 text-center">
+                      <p className="text-3xl font-bold text-[#DCDEE1] mb-1">
+                        Welcome to
+                      </p>
+                      <p className="text-3xl font-bold text-[#DCDEE1] mb-3">
+                        {serverData?.server.name}
+                      </p>
+                      <p className="text-[#B5BAC1] text-sm">
+                        This is your brand new, shiny server. Have fun chatting
+                        with your AI friends!
+                      </p>
                     </div>
-                  ) : (
-                    <>
-                      {messages.map((message, messageIndex) => {
-                        if (message.role === "user") {
-                          return (
-                            <div
-                              key={`user-${messageIndex}-${message.content.slice(0, 10)}`}
-                              className="flex gap-4 py-[2px] hover:bg-[#2D3035]"
-                            >
-                              <div className="w-10 h-10 rounded-full flex-shrink-0">
-                                <Image
-                                  src={userData?.profileImageUrl || ""}
-                                  alt="user avatar"
-                                  width={40}
-                                  height={40}
-                                  className="w-full h-full rounded-full object-cover"
-                                />
-                              </div>
-                              <div className="flex flex-col">
-                                <div className="flex items-center gap-2">
-                                  <span className="font-semibold text-[15px] text-[#F2F3F5]">
-                                    {userData?.name}
-                                  </span>
-                                  <span className="text-[11.5px] font-medium text-[#949BA4]">
-                                    {formatTime(
-                                      (message as any).timestamp || Date.now()
-                                    )}
-                                  </span>
-                                </div>
-                                <div className="text-[#DBDEE1] text-[15px]">
-                                  {message.content}
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        }
-
-                        if (Array.isArray(message.content)) {
-                          return message.content.map(
-                            (content: any, contentIndex: number) => {
-                              return splitMessages(content.text).map(
-                                (aiMessage: any, subIndex: number) => {
-                                  const friend = friends.find(
-                                    (f) =>
-                                      serverData?.serverMembers.find(
-                                        (m) => m.memberId === f?._id
-                                      )?.name === aiMessage.name
-                                  );
-
-                                  return (
-                                    <div
-                                      key={`array-${messageIndex}-${contentIndex}-${subIndex}-${aiMessage.name}`}
-                                      className="flex gap-4 py-[2px] hover:bg-[#2D3035]"
-                                    >
-                                      {friend?.friendImageUrl ? (
-                                        <div className="w-10 h-10 rounded-full flex-shrink-0">
-                                          <Image
-                                            src={friend.friendImageUrl}
-                                            alt={aiMessage.name}
-                                            width={40}
-                                            height={40}
-                                            className="w-full h-full rounded-full object-cover"
-                                          />
-                                        </div>
-                                      ) : (
-                                        <div
-                                          className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center"
-                                          style={{
-                                            backgroundColor:
-                                              friend?.profileColor ?? "",
-                                          }}
-                                        >
-                                          <Image
-                                            src="/logo-white.svg"
-                                            alt="Logo"
-                                            width={32}
-                                            height={32}
-                                            className="w-6 h-6 rounded-full"
-                                          />
-                                        </div>
-                                      )}
-                                      <div className="flex flex-col">
-                                        <div className="flex items-center gap-2">
-                                          <span className="font-semibold text-[15px] text-[#F2F3F5]">
-                                            {aiMessage.name}
-                                          </span>
-                                          <span className="text-[11.5px] font-medium text-[#949BA4]">
-                                            {formatTime(
-                                              (message as any).timestamp ||
-                                                Date.now()
-                                            )}
-                                          </span>
-                                        </div>
-                                        <div className="text-[#DBDEE1] text-[15px]">
-                                          {aiMessage.message}
-                                        </div>
-                                      </div>
-                                    </div>
-                                  );
-                                }
-                              );
-                            }
-                          );
-                        }
-
-                        return splitMessages(message.content).map(
-                          (aiMessage, index) => {
-                            const friend = friends.find(
-                              (f) =>
-                                serverData?.serverMembers.find(
-                                  (m) => m.memberId === f?._id
-                                )?.name === aiMessage.name
-                            );
-
-                            return (
-                              <div
-                                key={`string-${messageIndex}-${index}-${aiMessage.name}`}
-                                className="flex gap-4 py-[2px] hover:bg-[#2D3035]"
-                              >
-                                {friend?.friendImageUrl ? (
-                                  <div className="w-10 h-10 rounded-full flex-shrink-0">
-                                    <Image
-                                      src={friend.friendImageUrl}
-                                      alt={aiMessage.name}
-                                      width={40}
-                                      height={40}
-                                      className="w-full h-full rounded-full object-cover"
-                                    />
-                                  </div>
-                                ) : (
-                                  <div
-                                    className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center"
-                                    style={{
-                                      backgroundColor:
-                                        friend?.profileColor ?? "",
-                                    }}
-                                  >
-                                    <Image
-                                      src="/logo-white.svg"
-                                      alt="Logo"
-                                      width={32}
-                                      height={32}
-                                      className="w-6 h-6 rounded-full"
-                                    />
-                                  </div>
-                                )}
-                                <div className="flex flex-col">
-                                  <div className="flex items-center gap-2">
-                                    <span className="font-semibold text-[15px] text-[#F2F3F5]">
-                                      {aiMessage.name}
-                                    </span>
-                                    <span className="text-[11.5px] font-medium text-[#949BA4]">
-                                      {formatTime(
-                                        (message as any).timestamp || Date.now()
-                                      )}
-                                    </span>
-                                  </div>
-                                  <div className="text-[#DBDEE1] text-[15px]">
-                                    {aiMessage.message}
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          }
-                        );
-                      })}
-                    </>
-                  )}
-                  <div ref={messagesEndRef} />
+                    <Messages
+                      messages={messages}
+                      userData={userData}
+                      friends={friends}
+                      serverData={serverData}
+                      messagesEndRef={messagesEndRef}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </ScrollArea>
+            </ScrollArea>
+          </>
+        )}
         <div className="flex-shrink-0 px-4 pb-6 mt-2">
           <div className="flex items-center gap-4 bg-[#383A40] rounded-lg px-3 py-0.5 min-h-[44px]">
             <form
-              onSubmit={handleSubmit}
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (serverData.serverMembers.length === 1) {
+                  toast.error("Please add a friend first.");
+                  return;
+                }
+                handleSubmit(e);
+              }}
               className="flex items-center w-full gap-4"
             >
               <input

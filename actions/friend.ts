@@ -111,12 +111,3 @@ export async function deleteFriend(friendId: string) {
     throw new Error(String(error));
   }
 }
-
-export async function updateFriend(
-  friendId: string,
-  userId: string,
-  newFriendName?: string,
-  newModel?: string,
-  newPersonality?: string,
-  newFriendImage?: File
-) {}

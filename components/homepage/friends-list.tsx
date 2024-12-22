@@ -70,7 +70,7 @@ export default function FriendsList({
                         <div className="w-3.5 h-3.5 bg-green-500 rounded-full absolute bottom-[-2px] right-0 border-[2px] border-[#232428]" />
                       </div>
                       <div className="text-[14.5px] font-semibold text-[#949BA4] group-hover:text-[#DBDEE1] truncate">
-                        {friend?.username}
+                        {friend?.name}
                       </div>
                     </>
                   ) : (
@@ -91,7 +91,7 @@ export default function FriendsList({
                         </div>
                       </div>
                       <div className="text-[14.5px] font-semibold text-[#949BA4] group-hover:text-[#DBDEE1] truncate">
-                        {friend?.username}
+                        {friend?.name}
                       </div>
                     </>
                   )}
