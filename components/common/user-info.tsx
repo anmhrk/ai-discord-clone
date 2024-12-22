@@ -1,3 +1,5 @@
+"use client";
+
 import { UserData } from "@/lib/types";
 import { useClerk } from "@clerk/nextjs";
 import { Headphones, Mic, Settings } from "lucide-react";

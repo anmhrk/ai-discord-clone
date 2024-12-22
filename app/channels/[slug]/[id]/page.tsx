@@ -3,12 +3,16 @@ import { checkIfUserIsInServer } from "@/actions/server";
 import ChannelContent from "@/components/channel/channel-content";
 import ChannelTopNav from "@/components/channel/channel-top-nav";
 import ChannelsList from "@/components/channel/channels-list";
+import Content from "@/components/homepage/content";
 import FriendsList from "@/components/homepage/friends-list";
+import TopNav from "@/components/homepage/top-nav";
 import ServerNotFound from "@/components/server/server-not-found";
 import { api } from "@/convex/_generated/api";
 import { auth } from "@clerk/nextjs/server";
 import { preloadQuery } from "convex/nextjs";
 import { redirect } from "next/navigation";
+
+export const experimental_ppr = true;
 
 export default async function Page({
   params,
@@ -100,7 +104,16 @@ export default async function Page({
             preloadedUserData={preloadedUserData}
             preloadedFriends={preloadedFriends}
           />
-          <div className="flex-1 flex flex-col"></div>
+          <div className="flex-1 flex flex-col">
+            <TopNav
+              preloadedUserData={preloadedUserData}
+              preloadedFriends={preloadedFriends}
+            />
+            <Content
+              preloadedUserData={preloadedUserData}
+              preloadedFriends={preloadedFriends}
+            />
+          </div>
         </>
       );
     }

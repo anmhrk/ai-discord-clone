@@ -3,6 +3,7 @@ import { streamText, convertToCoreMessages, Message } from "ai";
 import { NextResponse } from "next/server";
 import { api } from "@/convex/_generated/api";
 import { fetchMutation, fetchQuery } from "convex/nextjs";
+import { auth } from "@clerk/nextjs/server";
 
 interface Friend {
   id: string;
@@ -28,47 +29,104 @@ const systemPrompt = (name: string, personality: string) => `\n
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const {
-      messages,
-      friends,
-      id,
-    }: { messages: Message[]; friends: Friend[]; id: string } = body;
+    const rawFriends = body.friends;
+    const friends: Friend[] = Array.isArray(rawFriends)
+      ? rawFriends
+      : [rawFriends];
+    const { messages, id }: { messages: Message[]; id: string } = body;
+    const { userId } = await auth();
+
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     const coreMessages = convertToCoreMessages(messages);
 
     if (friends.length === 1) {
-      const { name, personality } = friends[0];
-      const result = streamText({
-        model: xai("grok-2-1212"),
-        system: `${systemPrompt(name, personality)}`,
-        messages: coreMessages,
-        onFinish: async ({ response }) => {
-          try {
-            const existingMessages = await fetchQuery(api.message.getMessages, {
-              id: id,
-            });
-
-            const lastUserMessage = coreMessages[coreMessages.length - 1];
-            const lastAIMessage =
-              response.messages[response.messages.length - 1];
-
-            const updatedMessages = [
-              ...(existingMessages || []),
-              { ...lastUserMessage, timestamp: Date.now() },
-              { ...lastAIMessage, timestamp: Date.now() + 1 },
-            ];
-
-            await fetchMutation(api.message.createMessages, {
-              id: id,
-              messages: updatedMessages,
-            });
-          } catch (error) {
-            console.error("Error saving single chat messages:", error);
-          }
-        },
+      console.log("Direct Message Mode - Initial Data:", {
+        friendData: friends[0],
+        messageCount: messages.length,
+        userId,
       });
 
-      return result.toDataStreamResponse();
+      const { name, personality } = friends[0];
+
+      try {
+        const result = streamText({
+          model: xai("grok-2-1212"),
+          system: `${systemPrompt(name, personality)}`,
+          messages: coreMessages,
+          onFinish: async ({ response }) => {
+            console.log("AI Response Structure:", {
+              responseLength: response.messages.length,
+              lastMessage: response.messages[response.messages.length - 1],
+            });
+
+            try {
+              const existingMessages = await fetchQuery(
+                api.message.getMessages,
+                {
+                  id: id,
+                  userId: userId,
+                }
+              );
+              console.log("Existing Messages:", {
+                count: existingMessages?.length || 0,
+                lastMessage: existingMessages?.[existingMessages.length - 1],
+              });
+
+              const lastUserMessage = coreMessages[coreMessages.length - 1];
+              const lastAIMessage =
+                response.messages[response.messages.length - 1];
+
+              console.log("Message Processing:", {
+                lastUserMessage,
+                lastAIMessage,
+                timestamp: Date.now(),
+              });
+
+              const updatedMessages = [
+                ...(existingMessages || []),
+                { ...lastUserMessage, timestamp: Date.now() },
+                { ...lastAIMessage, timestamp: Date.now() + 1 },
+              ];
+
+              console.log("Updated Messages Array:", {
+                totalCount: updatedMessages.length,
+                lastTwoMessages: updatedMessages.slice(-2),
+              });
+
+              await fetchMutation(api.message.createMessages, {
+                id: id,
+                messages: updatedMessages,
+                userId: userId,
+              });
+              console.log("Messages successfully saved to database");
+            } catch (error) {
+              console.error("Error in onFinish callback:", {
+                error,
+                errorMessage:
+                  error instanceof Error ? error.message : "Unknown error",
+                errorStack: error instanceof Error ? error.stack : undefined,
+              });
+              throw error; // Re-throw to ensure the error is properly handled
+            }
+          },
+        });
+
+        console.log("StreamText completed successfully");
+        return result.toDataStreamResponse();
+      } catch (error) {
+        console.error("Error in Direct Message handling:", {
+          error,
+          errorMessage:
+            error instanceof Error ? error.message : "Unknown error",
+          errorStack: error instanceof Error ? error.stack : undefined,
+          friends: friends[0],
+          messageCount: messages.length,
+        });
+        throw error; // Re-throw to ensure the error is properly handled
+      }
     }
 
     const latestMessage = messages[messages.length - 1];
@@ -115,6 +173,7 @@ export async function POST(req: Request) {
         try {
           const existingMessages = await fetchQuery(api.message.getMessages, {
             id: id,
+            userId: userId,
           });
 
           const lastUserMessage = coreMessages[coreMessages.length - 1];
@@ -129,6 +188,7 @@ export async function POST(req: Request) {
           await fetchMutation(api.message.createMessages, {
             id: id,
             messages: updatedMessages,
+            userId: userId,
           });
         } catch (error) {
           console.error("Error saving group chat messages:", error);
@@ -138,8 +198,9 @@ export async function POST(req: Request) {
 
     return result.toDataStreamResponse();
   } catch (error) {
+    +console.error("Main Route Catch Block error:", error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: error instanceof Error ? error.message : JSON.stringify(error) },
       { status: 500 }
     );
   }

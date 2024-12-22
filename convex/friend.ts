@@ -47,6 +47,23 @@ export const createFriend = mutation({
         friendImageStorageId: args.friendImageStorageId,
         profileColor: args.profileColor,
       });
+
+      const newFriend = await ctx.db
+        .query("friends")
+        .filter((q) => {
+          return q.eq(q.field("friendId"), args.friendId);
+        })
+        .first();
+
+      if (!newFriend) {
+        throw new Error("Friend not found");
+      }
+
+      await ctx.db.insert("directMessages", {
+        participantOneId: user._id,
+        participantTwoId: newFriend._id,
+        messages: [],
+      });
     } catch (error) {
       if (error instanceof Error) {
         throw error;
@@ -106,6 +123,17 @@ export const deleteFriend = mutation({
     }
 
     await ctx.db.delete(friend._id);
+
+    const directMessage = await ctx.db
+      .query("directMessages")
+      .filter((q) => {
+        return q.eq(q.field("participantTwoId"), friend._id);
+      })
+      .first();
+
+    if (directMessage) {
+      await ctx.db.delete(directMessage._id);
+    }
 
     const serverMembers = await ctx.db
       .query("serverMembers")

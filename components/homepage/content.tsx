@@ -8,21 +8,36 @@ import { Preloaded } from "convex/react";
 import { Search, X } from "lucide-react";
 import { TbMessageCircleFilled } from "react-icons/tb";
 import { Separator } from "@/components/ui/separator";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { toast } from "sonner";
 import { deleteFriend } from "@/actions/friend";
+import DirectMessage from "./direct-message";
 
 export default function Content({
   preloadedFriends,
+  preloadedUserData,
 }: {
   preloadedFriends: Preloaded<typeof api.friend.getFriendsForUser>;
+  preloadedUserData: Preloaded<typeof api.user.getUserData>;
 }) {
   const friends = usePreloadedQuery(preloadedFriends);
+  const userData = usePreloadedQuery(preloadedUserData);
   const [search, setSearch] = useState("");
-  const [filteredFriends, setFilteredFriends] = useState(friends);
+  const [filteredFriends, setFilteredFriends] = useState<typeof friends>([]);
   const router = useRouter();
+  const params = useParams<{ slug: string; id: string }>();
+
+  if (params.id) {
+    return (
+      <DirectMessage
+        userData={userData}
+        friends={friends}
+        friendId={params.id}
+      />
+    );
+  }
 
   useEffect(() => {
     setFilteredFriends(friends);

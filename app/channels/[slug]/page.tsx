@@ -11,6 +11,8 @@ import ChannelTopNav from "../../../components/channel/channel-top-nav";
 import ChannelContent from "../../../components/channel/channel-content";
 import ChannelsList from "../../../components/channel/channels-list";
 
+export const experimental_ppr = true;
+
 export default async function Page({
   params,
 }: {
@@ -88,8 +90,14 @@ export default async function Page({
         preloadedFriends={preloadedFriends}
       />
       <div className="flex-1 flex flex-col">
-        <TopNav preloadedUserData={preloadedUserData} />
-        <Content preloadedFriends={preloadedFriends} />
+        <TopNav
+          preloadedUserData={preloadedUserData}
+          preloadedFriends={preloadedFriends}
+        />
+        <Content
+          preloadedUserData={preloadedUserData}
+          preloadedFriends={preloadedFriends}
+        />
       </div>
     </>
   );

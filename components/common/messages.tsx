@@ -7,13 +7,15 @@ export default function Messages({
   messages,
   userData,
   friends,
+  friendId,
   serverData,
   messagesEndRef,
 }: {
   messages: Message[];
   userData: UserData;
   friends: any[];
-  serverData: any;
+  friendId?: string;
+  serverData?: any;
   messagesEndRef: React.RefObject<HTMLDivElement>;
 }) {
   return (
@@ -55,12 +57,14 @@ export default function Messages({
           return message.content.map((content: any, contentIndex: number) => {
             return splitMessages(content.text).map(
               (aiMessage: any, subIndex: number) => {
-                const friend = friends.find(
-                  (f) =>
-                    serverData?.serverMembers.find(
-                      (m: any) => m.memberId === f?._id
-                    )?.name === aiMessage.name
-                );
+                const friend = friendId
+                  ? friends.find((f) => f.friendId === friendId)
+                  : friends.find(
+                      (f) =>
+                        serverData?.serverMembers.find(
+                          (m: any) => m.memberId === f?._id
+                        )?.name === aiMessage.name
+                    );
 
                 return (
                   <div
@@ -114,11 +118,14 @@ export default function Messages({
         }
 
         return splitMessages(message.content).map((aiMessage, index) => {
-          const friend = friends.find(
-            (f) =>
-              serverData?.serverMembers.find((m: any) => m.memberId === f?._id)
-                ?.name === aiMessage.name
-          );
+          const friend = friendId
+            ? friends.find((f) => f.friendId === friendId)
+            : friends.find(
+                (f) =>
+                  serverData?.serverMembers.find(
+                    (m: any) => m.memberId === f?._id
+                  )?.name === aiMessage.name
+              );
 
           return (
             <div
