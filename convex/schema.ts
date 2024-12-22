@@ -58,37 +58,46 @@ export default defineSchema({
     channelId: v.string(),
     serverId: v.id("servers"),
     updatedAt: v.optional(v.number()),
+    messages: v.array(
+      v.object({
+        role: v.string(),
+        content: v.union(
+          v.string(),
+          v.array(
+            v.object({
+              type: v.string(),
+              text: v.string(),
+            })
+          )
+        ),
+        timestamp: v.number(),
+      })
+    ),
   })
     .index("by_channelId", ["channelId"])
     .index("by_serverId", ["serverId"])
     .index("by_name", ["name"]),
 
-  channelMessages: defineTable({
-    channelId: v.id("channels"),
-    senderId: v.union(v.id("users"), v.id("friends")),
-    content: v.string(),
-  })
-    .index("by_channelId", ["channelId"])
-    .index("by_senderId", ["senderId"]),
-
   directMessages: defineTable({
     participantOneId: v.id("users"),
     participantTwoId: v.id("friends"),
-    updatedAt: v.optional(v.number()),
+    messages: v.array(
+      v.object({
+        role: v.string(),
+        content: v.union(
+          v.string(),
+          v.array(
+            v.object({
+              type: v.string(),
+              text: v.string(),
+            })
+          )
+        ),
+        timestamp: v.number(),
+      })
+    ),
   })
     .index("by_participants", ["participantOneId", "participantTwoId"])
     .index("by_participantOne", ["participantOneId"])
     .index("by_participantTwo", ["participantTwoId"]),
-
-  messagesInDm: defineTable({
-    conversationId: v.id("directMessages"),
-    senderId: v.union(v.id("users"), v.id("friends")),
-    content: v.string(),
-    replyTo: v.optional(v.id("messagesInDm")),
-    isEdited: v.optional(v.boolean()),
-    editedAt: v.optional(v.number()),
-    deletedAt: v.optional(v.number()),
-  })
-    .index("by_conversationId", ["conversationId"])
-    .index("by_senderId", ["senderId"]),
 });

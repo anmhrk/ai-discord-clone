@@ -24,6 +24,7 @@ export const createChannel = mutation({
         name: args.name,
         channelId: args.channelId,
         serverId: server._id,
+        messages: [],
       });
 
       if (server.defaultChannelId === "") {
