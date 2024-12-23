@@ -25,7 +25,7 @@ export default function DirectMessage({
   userData: UserData;
 }) {
   const [existingMessages, setExistingMessages] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [pageLoading, setPageLoading] = useState(true);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const friendName = friends.find(
     (friend) => friend?.friendId === friendId
@@ -39,22 +39,23 @@ export default function DirectMessage({
   useEffect(() => {
     if (storedMessages) {
       setExistingMessages(storedMessages);
-      setIsLoading(false);
+      setPageLoading(false);
     }
   }, [storedMessages]);
 
-  const { messages, input, handleInputChange, handleSubmit } = useChat({
-    body: {
-      friends: {
+  const { messages, input, handleInputChange, handleSubmit, isLoading } =
+    useChat({
+      body: {
+        friends: {
+          id: friendId,
+          name: friendName,
+          personality: friends.find((friend) => friend?.friendId === friendId)
+            ?.personality,
+        },
         id: friendId,
-        name: friendName,
-        personality: friends.find((friend) => friend?.friendId === friendId)
-          ?.personality,
       },
-      id: friendId,
-    },
-    initialMessages: existingMessages,
-  });
+      initialMessages: existingMessages,
+    });
 
   const messagesEndRef = useRef<HTMLDivElement>(null!);
 
@@ -76,7 +77,7 @@ export default function DirectMessage({
 
   return (
     <div className="flex-1 flex flex-col h-full">
-      {isLoading ? (
+      {pageLoading ? (
         <div className="flex flex-col items-center justify-center h-full">
           <Loader />
         </div>
@@ -105,13 +106,21 @@ export default function DirectMessage({
             onSubmit={handleSubmit}
             className="flex items-center w-full gap-4"
           >
-            <input
-              name="prompt"
-              value={input}
-              onChange={handleInputChange}
-              placeholder={`Message @${friendName}`}
-              className="text-[15px] flex-1 bg-[#383A40] font-medium border-none text-[#DCDEE1] placeholder:text-[#6D6F78] focus:outline-none w-full"
-            />
+            <div className="relative flex-1">
+              <input
+                name="prompt"
+                value={input}
+                onChange={handleInputChange}
+                placeholder={isLoading ? "" : `Message @${friendName}`}
+                className="text-[15px] w-full bg-[#383A40] font-medium border-none text-[#DCDEE1] placeholder:text-[#6D6F78] focus:outline-none"
+                disabled={isLoading}
+              />
+              {isLoading && (
+                <div className="absolute left-2 top-1/2 -translate-y-1/2">
+                  <div className="w-4 h-4 border-2 border-[#B5BAC1] border-t-transparent rounded-full animate-spin" />
+                </div>
+              )}
+            </div>
             <DropdownMenu
               open={showEmojiPicker}
               onOpenChange={setShowEmojiPicker}

@@ -14,7 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { FaEdit, FaUserPlus } from "react-icons/fa";
+import { FaUserPlus } from "react-icons/fa";
 import { FaCirclePlus } from "react-icons/fa6";
 import { deleteServer } from "@/actions/server";
 import { toast } from "sonner";

@@ -38,7 +38,7 @@ export default function ChannelContent({
   const userData = usePreloadedQuery(preloadedUserData);
 
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [pageLoading, setPageLoading] = useState(true);
   const [existingMessages, setExistingMessages] = useState<any[]>([]);
 
   const channelId =
@@ -49,22 +49,23 @@ export default function ChannelContent({
     channels &&
     (channels?.find((channel) => channel.channelId === channelId)?.name || "");
 
-  const { messages, input, handleInputChange, handleSubmit } = useChat({
-    body: {
-      friends: friends
-        .map((friend) => ({
-          id: friend?.friendId,
-          name:
-            serverData?.serverMembers.find(
-              (member) => member.memberId === friend?._id
-            )?.name ?? "",
-          personality: friend?.personality,
-        }))
-        .filter((friend) => friend.name),
-      id: channelId,
-    },
-    initialMessages: existingMessages,
-  });
+  const { messages, input, handleInputChange, handleSubmit, isLoading } =
+    useChat({
+      body: {
+        friends: friends
+          .map((friend) => ({
+            id: friend?.friendId,
+            name:
+              serverData?.serverMembers.find(
+                (member) => member.memberId === friend?._id
+              )?.name ?? "",
+            personality: friend?.personality,
+          }))
+          .filter((friend) => friend.name),
+        id: channelId,
+      },
+      initialMessages: existingMessages,
+    });
 
   const storedMessages = useQuery(api.message.getMessages, {
     id: channelId || "",
@@ -73,7 +74,7 @@ export default function ChannelContent({
   useEffect(() => {
     if (storedMessages) {
       setExistingMessages(storedMessages);
-      setIsLoading(false);
+      setPageLoading(false);
     }
   }, [storedMessages]);
 
@@ -98,7 +99,7 @@ export default function ChannelContent({
   return (
     <div className="flex-1 flex flex-row">
       <div className="flex-1 flex flex-col h-full">
-        {isLoading ? (
+        {pageLoading ? (
           <div className="flex flex-col items-center justify-center h-screen">
             <Loader />
           </div>
@@ -146,13 +147,21 @@ export default function ChannelContent({
               }}
               className="flex items-center w-full gap-4"
             >
-              <input
-                name="prompt"
-                value={input}
-                onChange={handleInputChange}
-                placeholder={`Message #${channelName}`}
-                className="text-[15px] flex-1 bg-[#383A40] font-medium border-none text-[#DCDEE1] placeholder:text-[#6D6F78] focus:outline-none w-full"
-              />
+              <div className="relative flex-1">
+                <input
+                  name="prompt"
+                  value={input}
+                  onChange={handleInputChange}
+                  placeholder={isLoading ? "" : `Message #${channelName}`}
+                  className="text-[15px] w-full bg-[#383A40] font-medium border-none text-[#DCDEE1] placeholder:text-[#6D6F78] focus:outline-none"
+                  disabled={isLoading}
+                />
+                {isLoading && (
+                  <div className="absolute left-2 top-1/2 -translate-y-1/2">
+                    <div className="w-4 h-4 border-2 border-[#B5BAC1] border-t-transparent rounded-full animate-spin" />
+                  </div>
+                )}
+              </div>
               <DropdownMenu
                 open={showEmojiPicker}
                 onOpenChange={setShowEmojiPicker}

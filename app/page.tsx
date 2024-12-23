@@ -22,6 +22,17 @@ export default function Home() {
           Open the app
         </Link>
       </div>
+      <footer className="absolute bottom-4 text-sm text-white">
+        <span>
+          Built by{" "}
+          <Link
+            href="https://github.com/anmolhurkat/not-discord"
+            className="hover:text-zinc-200 transition-colors"
+          >
+            <span className="underline">@anmolhurkat</span>
+          </Link>
+        </span>
+      </footer>
     </div>
   );
 }

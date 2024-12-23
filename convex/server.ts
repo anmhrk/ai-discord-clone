@@ -196,16 +196,6 @@ export const deleteServer = mutation({
 
     for (const channel of channels) {
       await ctx.db.delete(channel._id);
-      const channelMessages = await ctx.db
-        .query("channelMessages")
-        .filter((q) => {
-          return q.eq(q.field("channelId"), channel._id);
-        })
-        .collect();
-
-      for (const message of channelMessages) {
-        await ctx.db.delete(message._id);
-      }
     }
 
     if (server.serverImageStorageId) {
