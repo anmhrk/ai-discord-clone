@@ -1,5 +1,6 @@
 import ServerSidebar from "@/components/server/server-sidebar";
 import { api } from "@/convex/_generated/api";
+import { SignedIn } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import { preloadQuery } from "convex/nextjs";
 import { redirect } from "next/navigation";
@@ -31,7 +32,7 @@ export default async function Layout({
           preloadedUserData={preloadedUserData}
           preloadedServers={preloadedServers}
         />
-        {children}
+        <SignedIn>{children}</SignedIn>
       </div>
     );
   } catch (error) {
