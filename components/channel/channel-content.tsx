@@ -22,6 +22,12 @@ import { FaCirclePlus } from "react-icons/fa6";
 import Image from "next/image";
 import { deleteImage, uploadImage } from "@/actions/image";
 import { Id } from "@/convex/_generated/dataModel";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function ChannelContent({
   preloadedServerData,
@@ -247,10 +253,30 @@ export default function ChannelContent({
                     </button>
                   </div>
                 ) : (
-                  <FaCirclePlus
-                    className="w-6 h-6 text-[#B3B7BE] hover:text-[#DBDEE1] cursor-pointer flex-shrink-0"
-                    onClick={() => fileInputRef.current?.click()}
-                  />
+                  <TooltipProvider>
+                    <Tooltip delayDuration={0}>
+                      <TooltipTrigger asChild>
+                        <div>
+                          <FaCirclePlus
+                            className={`w-6 h-6 ${
+                              userData?.hasNitro
+                                ? "text-[#B3B7BE] hover:text-[#DBDEE1] cursor-pointer"
+                                : "text-[#6D6F78] cursor-not-allowed"
+                            } flex-shrink-0`}
+                            onClick={() =>
+                              userData?.hasNitro &&
+                              fileInputRef.current?.click()
+                            }
+                          />
+                        </div>
+                      </TooltipTrigger>
+                      {!userData?.hasNitro && (
+                        <TooltipContent>
+                          <p>Subscribe to Nitro to send images</p>
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
+                  </TooltipProvider>
                 )}
 
                 <input

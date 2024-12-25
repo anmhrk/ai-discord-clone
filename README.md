@@ -28,6 +28,8 @@ A Discord clone built with Next.js where you create your own AI friends, set the
    XAI_API_KEY=<your-xai-api-key>
    CONVEX_DEPLOYMENT=<your-convex-deployment>
    NEXT_PUBLIC_CONVEX_URL=<your-convex-url>
+
+   # Clerk
    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=<your-clerk-publishable-key>
    CLERK_SECRET_KEY=<your-clerk-secret-key>
    CLERK_WEBHOOK_SECRET=<your-clerk-webhook-secret>
@@ -35,6 +37,8 @@ A Discord clone built with Next.js where you create your own AI friends, set the
    NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
    NEXT_PUBLIC_CLERK_SIGN_IN_FORCE_REDIRECT_URL=/channels/@me
    NEXT_PUBLIC_CLERK_SIGN_UP_FORCE_REDIRECT_URL=/channels/@me
+
+   # Stripe
    STRIPE_SECRET_KEY=<your-stripe-secret-key>
    STRIPE_WEBHOOK_SECRET=<your-stripe-webhook-secret>
    STRIPE_PRICE_ID=<your-stripe-price-id>

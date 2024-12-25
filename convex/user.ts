@@ -76,6 +76,15 @@ export const deleteUser = mutation({
             friend.friendImageStorageId as Id<"_storage">
           );
         }
+
+        const members = await ctx.db
+          .query("serverMembers")
+          .filter((q) => q.eq(q.field("memberId"), friend._id))
+          .collect();
+
+        for (const member of members) {
+          await ctx.db.delete(member._id);
+        }
       }
 
       const servers = await ctx.db

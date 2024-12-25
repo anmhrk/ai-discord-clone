@@ -12,15 +12,11 @@ export default function UserInfo({ userData }: { userData: UserData }) {
     <div className="px-1 py-[6px] bg-[#232428] flex items-center justify-between gap-2 min-h-[52px] group">
       <div className="px-1 flex items-center gap-2 hover:bg-[#35373C] w-full rounded-[4px] cursor-pointer">
         <div className="relative">
-          {/* <Image
-            src={userData?.profileImageUrl || ""}
-            alt={userData?.name || ""}
-            width={32}
-            height={32}
-            className="w-8 h-8 rounded-full"
-          /> */}
           <UserButton appearance={{ elements: { rootBox: "w-8 h-8" } }} />
-          <div className="w-3.5 h-3.5 bg-green-500 rounded-full absolute bottom-[2px] right-0 border-[2px] border-[#232428]" />
+          <div
+            className="w-3.5 h-3.5 bg-green-500 rounded-full absolute bottom-[2px] right-0 border-[2px] border-[#232428]"
+            aria-hidden="true"
+          ></div>
         </div>
         <div className="flex-1 min-w-0">
           <div className="text-sm font-semibold truncate text-[#DBDEE1]">
