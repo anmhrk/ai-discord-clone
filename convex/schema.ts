@@ -6,12 +6,17 @@ export default defineSchema({
     userId: v.string(),
     name: v.string(),
     username: v.string(),
+    email: v.string(),
     profileImageUrl: v.string(),
     updatedAt: v.optional(v.number()),
+    stripeCustomerId: v.optional(v.string()),
+    hasNitro: v.boolean(),
   })
     .index("by_userId", ["userId"])
     .index("by_name", ["name"])
-    .index("by_username", ["username"]),
+    .index("by_username", ["username"])
+    .index("by_email", ["email"])
+    .index("by_stripeCustomerId", ["stripeCustomerId"]),
 
   friends: defineTable({
     friendId: v.string(),
@@ -21,7 +26,6 @@ export default defineSchema({
     personality: v.string(),
     friendImageUrl: v.optional(v.string()),
     friendImageStorageId: v.optional(v.string()),
-    updatedAt: v.optional(v.number()),
     profileColor: v.optional(v.string()),
   })
     .index("by_friendId", ["friendId"])
@@ -35,7 +39,6 @@ export default defineSchema({
     ownerId: v.id("users"),
     serverImageUrl: v.optional(v.string()),
     serverImageStorageId: v.optional(v.string()),
-    updatedAt: v.optional(v.number()),
     defaultChannelId: v.string(),
   })
     .index("by_name", ["name"])
@@ -57,7 +60,6 @@ export default defineSchema({
     name: v.string(),
     channelId: v.string(),
     serverId: v.id("servers"),
-    updatedAt: v.optional(v.number()),
     messages: v.array(
       v.object({
         role: v.string(),

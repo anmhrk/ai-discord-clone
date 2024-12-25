@@ -2,7 +2,7 @@
 
 A Discord clone built with Next.js where you create your own AI friends, set their names and personalities, DM them, add them to servers, and chat with them.
 
-## Stack
+## Tech Stack
 
 - [Next.js 15](https://nextjs.org/) w/ App Router
 - [Clerk](https://clerk.dev/) for authentication
@@ -10,6 +10,7 @@ A Discord clone built with Next.js where you create your own AI friends, set the
 - [Convex](https://www.convex.dev/) for database and image storage
 - [Vercel AI SDK](https://sdk.vercel.ai/) for text streaming
 - [xAI Grok API](https://x.ai/grok) for AI responses
+- [Stripe](https://stripe.com/) for Nitro subscription
 
 ## Setup
 
@@ -32,8 +33,12 @@ A Discord clone built with Next.js where you create your own AI friends, set the
    CLERK_WEBHOOK_SECRET=<your-clerk-webhook-secret>
    NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
    NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
-   NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/channels/@me
-   NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/channels/@me
+   NEXT_PUBLIC_CLERK_SIGN_IN_FORCE_REDIRECT_URL=/channels/@me
+   NEXT_PUBLIC_CLERK_SIGN_UP_FORCE_REDIRECT_URL=/channels/@me
+   STRIPE_SECRET_KEY=<your-stripe-secret-key>
+   STRIPE_WEBHOOK_SECRET=<your-stripe-webhook-secret>
+   STRIPE_PRICE_ID=<your-stripe-price-id>
+   NEXT_PUBLIC_STRIPE_PAYMENT_LINK_URL=<your-stripe-payment-link-url>
    ```
 
 3. Install dependencies:
@@ -42,22 +47,28 @@ A Discord clone built with Next.js where you create your own AI friends, set the
    bun install
    ```
 
-4. Set up Convex:
+4. Init Convex functions:
 
    ```
    bunx convex dev
    ```
 
-5. Link ngrok to your local server and create Clerk webhook:
+5. Link ngrok to your development server and create Clerk webhook:
 
    ```
    ngrok http 3000
    ```
 
-6. Run the development server:
+6. Allow Stripe to forward webhook events to your development server:
+
+   ```
+   stripe login --forward-to http://localhost:3000/api/webhook/stripe
+   ```
+
+7. Run the development server:
 
    ```
    bun dev
    ```
 
-7. Open your browser and navigate to `http://localhost:3000` to see the website live.
+8. Open your browser and navigate to `http://localhost:3000` to see the website live.

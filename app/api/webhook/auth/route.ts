@@ -65,6 +65,7 @@ export async function POST(req: Request) {
               .split("@")[0]
               .replaceAll(".", ""),
           profileImageUrl: payload.data.image_url,
+          email: payload.data.email_addresses[0].email_address,
         };
 
         await fetchMutation(api.user.insertUser, userData);

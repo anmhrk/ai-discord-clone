@@ -7,7 +7,9 @@ export type UserData = {
   userId: string;
   name: string;
   username: string;
+  email: string;
   profileImageUrl: string;
+  hasNitro: boolean;
 } | null;
 
 export type ServerMember = {

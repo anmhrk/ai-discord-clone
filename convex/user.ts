@@ -8,6 +8,7 @@ export const insertUser = mutation({
     name: v.string(),
     username: v.string(),
     profileImageUrl: v.string(),
+    email: v.string(),
   },
   handler: async (ctx, args) => {
     try {
@@ -16,6 +17,8 @@ export const insertUser = mutation({
         name: args.name,
         username: args.username,
         profileImageUrl: args.profileImageUrl,
+        email: args.email,
+        hasNitro: false,
       });
     } catch (error) {
       throw new Error("Failed to create user");
@@ -98,16 +101,6 @@ export const deleteUser = mutation({
 
         for (const channel of channels) {
           await ctx.db.delete(channel._id);
-          const channelMessages = await ctx.db
-            .query("channelMessages")
-            .filter((q) => {
-              return q.eq(q.field("channelId"), channel._id);
-            })
-            .collect();
-
-          for (const message of channelMessages) {
-            await ctx.db.delete(message._id);
-          }
         }
       }
 
@@ -127,15 +120,6 @@ export const deleteUser = mutation({
 
       for (const directMessage of directMessages) {
         await ctx.db.delete(directMessage._id);
-
-        const messagesInDm = await ctx.db
-          .query("messagesInDm")
-          .filter((q) => q.eq(q.field("conversationId"), directMessage._id))
-          .collect();
-
-        for (const message of messagesInDm) {
-          await ctx.db.delete(message._id);
-        }
       }
     } catch (error) {
       throw new Error("Failed to delete user");
@@ -164,6 +148,55 @@ export const updateUser = mutation({
       });
     } catch (error) {
       throw new Error("Failed to update user");
+    }
+  },
+});
+
+export const subscribeToNitro = mutation({
+  args: {
+    email: v.optional(v.string()),
+    customerId: v.string(),
+    event: v.string(),
+  },
+  handler: async (ctx, args) => {
+    try {
+      if (args.event === "subscribe") {
+        const user = await ctx.db
+          .query("users")
+          .filter((q) => q.eq(q.field("email"), args.email))
+          .first();
+
+        if (!user) {
+          throw new Error("User not found");
+        }
+
+        if (args.event === "subscribe") {
+          await ctx.db.patch(user._id, {
+            hasNitro: true,
+            stripeCustomerId: args.customerId,
+            updatedAt: Date.now(),
+          });
+        }
+      }
+
+      if (args.event === "unsubscribe") {
+        const customer = await ctx.db
+          .query("users")
+          .filter((q) => q.eq(q.field("stripeCustomerId"), args.customerId))
+          .first();
+
+        if (!customer) {
+          throw new Error("Customer not found");
+        }
+
+        await ctx.db.patch(customer._id, {
+          hasNitro: false,
+          stripeCustomerId: undefined,
+          updatedAt: Date.now(),
+        });
+      }
+    } catch (error) {
+      throw new Error("Something went wrong");
     }
   },
 });

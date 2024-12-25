@@ -9,6 +9,8 @@ import { Preloaded, usePreloadedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
+import { LuSparkles } from "react-icons/lu";
+import { toast } from "sonner";
 
 export default function FriendsList({
   preloadedUserData,
@@ -30,10 +32,25 @@ export default function FriendsList({
         </button>
       </div>
       <Separator className="bg-[#1E1F22] h-[1px] w-full" />
-      <div className="px-2 pt-2">
+      <div className="px-2 pt-2 space-y-0.5">
         <button className="flex items-center w-full px-3 py-[8px] rounded bg-[#404249] hover:bg-[#34353A] gap-4 text-white">
           <Users className="w-6 h-6" />
           <span className="text-[15px] font-medium">Friends</span>
+        </button>
+        <button
+          className="flex items-center w-full px-3 py-[8px] rounded hover:bg-[#34353A] gap-4 text-[#949BA4] hover:text-white"
+          onClick={() => {
+            if (userData?.hasNitro) {
+              toast.success("You already have Nitro!");
+            } else {
+              router.push(
+                `${process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_URL}?prefilled_email=${userData?.email}`
+              );
+            }
+          }}
+        >
+          <LuSparkles className="w-5 h-5 mr-1" />
+          <span className="text-[15px] font-medium">Nitro</span>
         </button>
       </div>
 
