@@ -3,6 +3,7 @@
 import { api } from "@/convex/_generated/api";
 import { auth } from "@clerk/nextjs/server";
 import { fetchMutation } from "convex/nextjs";
+import { uploadImage } from "./image";
 
 export async function checkIfUserCreatedFriend(friendId: string) {
   const { userId } = await auth();
@@ -48,25 +49,7 @@ export async function createFriend(
     }
 
     if (friendImage) {
-      const friendImageUrl = await fetchMutation(api.storage.generateUploadUrl);
-
-      const result = await fetch(friendImageUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": friendImage.type,
-        },
-        body: friendImage,
-      });
-
-      if (!result.ok) {
-        throw new Error("Image upload failed:" + result.statusText);
-      }
-
-      const { storageId } = await result.json();
-
-      const url = await fetchMutation(api.storage.getUploadUrl, {
-        storageId,
-      });
+      const { url, storageId } = await uploadImage(friendImage);
 
       if (url) {
         await fetchMutation(api.friend.createFriend, {

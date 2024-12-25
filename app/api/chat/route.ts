@@ -1,5 +1,5 @@
 import { xai } from "@ai-sdk/xai";
-import { streamText, convertToCoreMessages, Message } from "ai";
+import { streamText, convertToCoreMessages, Message, CoreMessage } from "ai";
 import { NextResponse } from "next/server";
 import { api } from "@/convex/_generated/api";
 import { fetchMutation, fetchQuery } from "convex/nextjs";
@@ -25,6 +25,7 @@ const systemPrompt = (name: string, personality: string) => `\n
     - you can use emojis in your responses, but use them very sparingly and only when it absolutely makes sense to do so
     - the current date and time is ${new Date().toLocaleString()} if needed
     - always respond in the format "${name}: your message". never respond without this format
+    - if the user sends an image, never say that you can't see it, just respond with whatever they asked you to do with the image
   `;
 
 export async function POST(req: Request) {
@@ -34,7 +35,11 @@ export async function POST(req: Request) {
     const friends: Friend[] = Array.isArray(rawFriends)
       ? rawFriends
       : [rawFriends];
-    const { messages, id }: { messages: Message[]; id: string } = body;
+    const {
+      messages,
+      id,
+      data,
+    }: { messages: Message[]; id: string; data: any } = body;
     const { userId } = await auth();
 
     if (!userId) {
@@ -42,15 +47,38 @@ export async function POST(req: Request) {
     }
 
     const coreMessages = convertToCoreMessages(messages);
+    const lastMessage = coreMessages[coreMessages.length - 1];
+
+    const formattedLastMessage = data?.imageUrl
+      ? {
+          role: lastMessage.role,
+          content: [
+            { type: "text", text: lastMessage.content },
+            { type: "image", image: new URL(data.imageUrl) },
+          ],
+        }
+      : lastMessage;
+
+    const updatedMessages = [
+      ...coreMessages.slice(0, -1),
+      formattedLastMessage,
+    ];
+
+    const formattedMessages = updatedMessages.map((msg) => ({
+      role: msg.role,
+      content: Array.isArray(msg.content)
+        ? msg.content
+        : [{ type: "text", text: msg.content }],
+    }));
 
     if (friends.length === 1) {
       const { name, personality } = friends[0];
 
       try {
         const result = streamText({
-          model: xai("grok-2-1212"),
+          model: xai("grok-2-vision-1212"),
           system: `${systemPrompt(name, personality)}`,
-          messages: coreMessages,
+          messages: formattedMessages as CoreMessage[],
           onFinish: async ({ response }) => {
             try {
               const existingMessages = await fetchQuery(
@@ -88,6 +116,8 @@ export async function POST(req: Request) {
       }
     }
 
+    // group chat logic below
+
     const latestMessage = messages[messages.length - 1];
 
     const isFriendMentioned = (message: string, friendName: string) => {
@@ -117,7 +147,7 @@ export async function POST(req: Request) {
 
     try {
       const result = streamText({
-        model: xai("grok-2-1212"),
+        model: xai("grok-2-vision-1212"),
         system: `${systemPrompt(respondingFriends[0].name, respondingFriends[0].personality)}
       Additional context: You are in a group chat with the following participants: ${respondingFriends
         .map((f: Friend) => f.name)
@@ -128,7 +158,7 @@ export async function POST(req: Request) {
       - not everyone needs to respond in a strict order
       - respond as if in a real group chat where people chime in naturally
       ${isEveryoneMentioned(latestMessage.content) ? "Since @everyone was mentioned, ensure ALL participants respond to the message at least once." : ""}`,
-        messages: coreMessages,
+        messages: formattedMessages as CoreMessage[],
         onFinish: async ({ response }) => {
           try {
             const existingMessages = await fetchQuery(api.message.getMessages, {

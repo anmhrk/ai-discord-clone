@@ -3,6 +3,7 @@
 import { api } from "@/convex/_generated/api";
 import { auth } from "@clerk/nextjs/server";
 import { fetchMutation } from "convex/nextjs";
+import { uploadImage } from "./image";
 
 export async function checkIfUserIsInServer(serverId: string) {
   // server can exist but if user is not a member, then return false
@@ -40,25 +41,7 @@ export async function createServer(
     }
 
     if (serverImage) {
-      const serverImageUrl = await fetchMutation(api.storage.generateUploadUrl);
-
-      const result = await fetch(serverImageUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": serverImage.type,
-        },
-        body: serverImage,
-      });
-
-      if (!result.ok) {
-        throw new Error("Image upload failed:" + result.statusText);
-      }
-
-      const { storageId } = await result.json();
-
-      const url = await fetchMutation(api.storage.getUploadUrl, {
-        storageId,
-      });
+      const { url, storageId } = await uploadImage(serverImage);
 
       if (url) {
         await fetchMutation(api.server.createServer, {
