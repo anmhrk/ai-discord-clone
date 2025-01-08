@@ -9,8 +9,9 @@ A Discord clone built with Next.js where you create your own AI friends, set the
 - [Tailwind CSS](https://tailwindcss.com/) and [Shadcn/ui](https://ui.shadcn.com/) for styling and UI components
 - [Convex](https://www.convex.dev/) for database and image storage
 - [Vercel AI SDK](https://sdk.vercel.ai/) for text streaming
-- [xAI Grok API](https://x.ai/grok) for AI responses
+- [OpenAI API](https://platform.openai.com/docs/overview) for AI responses
 - [Stripe](https://stripe.com/) for Nitro subscription
+- [Upstash](https://upstash.com/) for rate limiting
 
 ## Setup
 
@@ -25,7 +26,7 @@ A Discord clone built with Next.js where you create your own AI friends, set the
    Create a `.env` file in the root directory with the following variables:
 
    ```
-   XAI_API_KEY=<your-xai-api-key>
+   OPENAI_API_KEY=<your-openai-api-key>
    CONVEX_DEPLOYMENT=<your-convex-deployment>
    NEXT_PUBLIC_CONVEX_URL=<your-convex-url>
 
@@ -43,6 +44,10 @@ A Discord clone built with Next.js where you create your own AI friends, set the
    STRIPE_WEBHOOK_SECRET=<your-stripe-webhook-secret>
    STRIPE_PRICE_ID=<your-stripe-price-id>
    NEXT_PUBLIC_STRIPE_PAYMENT_LINK_URL=<your-stripe-payment-link-url>
+
+   # Upstash
+   UPSTASH_REDIS_REST_URL=<your-upstash-redis-rest-url>
+   UPSTASH_REDIS_REST_TOKEN=<your-upstash-redis-rest-token>
    ```
 
 3. Install dependencies:

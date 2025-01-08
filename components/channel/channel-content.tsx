@@ -65,7 +65,7 @@ export default function ChannelContent({
     channels &&
     (channels?.find((channel) => channel.channelId === channelId)?.name || "");
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading } =
+  const { messages, input, handleInputChange, handleSubmit, isLoading, error } =
     useChat({
       body: {
         friends: friends
@@ -89,6 +89,9 @@ export default function ChannelContent({
         if (imageStorageId) {
           await deleteImage(imageStorageId as Id<"_storage">);
         }
+      },
+      onError: (error) => {
+        toast.error(JSON.parse(error.message).error);
       },
     });
 

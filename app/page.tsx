@@ -26,10 +26,10 @@ export default function Home() {
         <span>
           Built by{" "}
           <Link
-            href="https://github.com/anmolhurkat/not-discord"
+            href="https://github.com/anmhrk/ai-discord-clone"
             className="hover:text-zinc-200 transition-colors"
           >
-            <span className="underline">@anmolhurkat</span>
+            <span className="underline">@anmhrk</span>
           </Link>
         </span>
       </footer>

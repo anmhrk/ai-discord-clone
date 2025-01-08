@@ -1,9 +1,10 @@
-import { xai } from "@ai-sdk/xai";
+import { openai } from "@ai-sdk/openai";
 import { streamText, convertToCoreMessages, Message, CoreMessage } from "ai";
 import { NextResponse } from "next/server";
 import { api } from "@/convex/_generated/api";
 import { fetchMutation, fetchQuery } from "convex/nextjs";
 import { auth } from "@clerk/nextjs/server";
+import { ratelimit } from "@/lib/ratelimit";
 
 interface Friend {
   id: string;
@@ -46,6 +47,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { success } = await ratelimit.limit(userId);
+    if (!success) {
+      return NextResponse.json(
+        { error: "Too many requests. Try again later." },
+        { status: 429 }
+      );
+    }
+
     const coreMessages = convertToCoreMessages(messages);
     const lastMessage = coreMessages[coreMessages.length - 1];
 
@@ -76,7 +85,7 @@ export async function POST(req: Request) {
 
       try {
         const result = streamText({
-          model: xai("grok-2-vision-1212"),
+          model: openai("gpt-4o-mini"),
           system: `${systemPrompt(name, personality)}`,
           messages: formattedMessages as CoreMessage[],
           onFinish: async ({ response }) => {
@@ -147,7 +156,7 @@ export async function POST(req: Request) {
 
     try {
       const result = streamText({
-        model: xai("grok-2-vision-1212"),
+        model: openai("gpt-4o-mini"),
         system: `${systemPrompt(respondingFriends[0].name, respondingFriends[0].personality)}
       Additional context: You are in a group chat with the following participants: ${respondingFriends
         .map((f: Friend) => f.name)

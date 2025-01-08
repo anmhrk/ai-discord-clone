@@ -84,6 +84,9 @@ export default function DirectMessage({
           await deleteImage(imageStorageId as Id<"_storage">);
         }
       },
+      onError: (error) => {
+        toast.error(JSON.parse(error.message).error);
+      },
     });
 
   const messagesEndRef = useRef<HTMLDivElement>(null!);
